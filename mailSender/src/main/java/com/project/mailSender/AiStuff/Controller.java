@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -14,7 +15,13 @@ public class Controller {
     AiService service;
 
     @GetMapping("/get")
-    public ResponseEntity<String> getResponse(@RequestParam String prompt){
-        return new ResponseEntity<>(service.chat(prompt), HttpStatus.OK);
+    public Flux<String> getResponse(@RequestParam String prompt){
+        return service.getResponse(prompt);
     }
+
+//    @PostMapping("/recipients")
+//    public void getRecipients(@RequestBody String request) throws Exception {
+//
+//         service.getRecipients(request);
+//    }
 }

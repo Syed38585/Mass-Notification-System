@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface EmailOpenLogRepo extends JpaRepository<EmailOpenLog, Long> {
 
-    List<EmailOpenLog> findAllByOrderByOpenedAtDesc();
 
-    boolean existsByEmailId(String emailId);
-}
+        List<EmailOpenLog> findAllByOrderByOpenedAtDesc();
+
+        boolean existsByEmailId(String email);
+    }

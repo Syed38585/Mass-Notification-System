@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 
 @Data
 @Entity
 @NoArgsConstructor
-public class Users{
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +18,6 @@ public class Users{
     @Column(unique = true, nullable = false)
     String email;
     String gender;
-    @Value("${boolean.isPrime:false}")
-    boolean isPrime;
+    boolean isSubscribed;
+    String dob;
 }

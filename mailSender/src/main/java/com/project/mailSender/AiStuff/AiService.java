@@ -1,11 +1,18 @@
 package com.project.mailSender.AiStuff;
 
+import com.project.mailSender.Model.AiLog;
+import com.project.mailSender.Repository.AiLogRepo;
 import com.project.mailSender.Service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AiService {
@@ -17,76 +24,62 @@ public class AiService {
 //    private String apiUrl;
 //
 
-        private final ChatClient chatClient;
+    private final ChatClient chatClient;
 
-        @Autowired
-        UserService service;
+    private final GetUserInfo getUserInfo;
 
-        public AiService(ChatClient.Builder builder) {
-            this.chatClient = builder.build();
-        }
+    private final EmailTool emailTool;
 
-        public String chat(String prompt) {
-            return chatClient.prompt(prompt)
-                    .call()
-                    .content();
-        }
+    private final AnalyticsAgent analyticsAgent;
 
-//    public List<UserDto> getRecipients(String prompt) throws Exception {
-//
-//        System.out.println("Step 1");
-//
-//        List<Users> users = service.getAll();
-//
-//        System.out.println("Step 2");
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//
-//        String usersJson = mapper.writeValueAsString(users);
-//
-//        System.out.println("Step 3");
-//
-//        String finalPrompt = """
-//    You are given these users.
-//
-//    %s
-//
-//    User Request:
-//
-//    %s
-//
-//Return ONLY a JSON array.
-//
-//Each object MUST contain exactly these fields:
-//
-//[
-//  {
-//    "id": 1,
-//    "name": "John",
-//    "email": "john@gmail.com"
-//  }
-//]
-//
-//Do not include gender.
-//Do not include dob.
-//Do not include prime.
-//    """.formatted(usersJson, prompt);
-//
-//        System.out.println("Step 4");
-//        System.out.println(finalPrompt);
-//
-//        String response = chatClient.prompt(finalPrompt)
-//                .call()
-//                .content();
-//
-//        System.out.println("Step 5");
-//
-//        System.out.println(response);
-//
-//        return mapper.readValue(
-//                response,
-//                new com.fasterxml.jackson.core.type.TypeReference<List<UserDto>>() {}
-//        );
-//    }
+    private final UserService userService;
+
+    private final AiLogRepo aiLogRepo;
+
+    List<Message> list = new ArrayList<>();
+
+    public AiService(ChatClient.Builder builder, GetUserInfo getUserInfo, EmailTool emailTool, AnalyticsAgent analyticsAgent, UserService userService, AiLogRepo aiLogRepo) {
+        this.chatClient = builder.build();
+        this.getUserInfo = getUserInfo;
+        this.emailTool = emailTool;
+        this.analyticsAgent = analyticsAgent;
+        this.userService = userService;
+        this.aiLogRepo = aiLogRepo;
+    }
+
+    String SYSTEM_PROMPT = """
+            Role = You are an AI assistant at MAIL PILOT AI, a platform used to send emails.and also have access to Analytics tools
+            
+            Task = Your task is to provide the information requested by the admin. You have access to tools such as user information retrieval and email sending. You can send emails to users specified by the admin. When the admin provides a message, retrieve the users who match the given criteria, professionally polish the message while preserving its original meaning, and send it to the appropriate users.
+            and even if the user is not available in repo use the email specified by user to send mail
+            and at the end of every mail if the user has provided the name use it in regards or use Admin @ Mail Pilot AI Team
+            
+            The email-sending process should run in the background. Do not wait for the email process to finish before responding to the admin. Respond immediately after the email-sending process has been initiated and allow the email-sending task to continue in the background.
+            
+            Behaviour = Your behaviour should always be professional, clear, and positive.
+            
+            Constraint = Do not respond in an unprofessional manner. Always be honest about the status of the requested operation and never claim that an email has been sent unless the sending process has actually been initiated.
+            """;
+
+
+
+    public Flux<String> getResponse(String prompt) {
+
+        list.add(new UserMessage(prompt));
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        AiLog log = new AiLog();
+        log.setRequestedAt(LocalDateTime.now());
+        aiLogRepo.save(log);
+
+        return chatClient.prompt()
+                .system(SYSTEM_PROMPT)
+                .messages(list)
+                .tools(getUserInfo, emailTool, analyticsAgent)
+                .stream()
+                .content()
+                .doOnNext(stringBuilder::append)
+                .doOnComplete(() -> list.add(new AssistantMessage(stringBuilder.toString())));
+    }
 }
-

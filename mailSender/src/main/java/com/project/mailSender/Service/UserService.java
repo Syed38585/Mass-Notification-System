@@ -5,8 +5,12 @@ import com.project.mailSender.Model.UserDto;
 import com.project.mailSender.Model.Users;
 import com.project.mailSender.Repository.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -24,7 +28,8 @@ public class UserService {
         users.setName(user.getName().toLowerCase());
         users.setEmail(user.getEmail().toLowerCase());
         users.setGender(user.getGender().toLowerCase());
-        users.setPrime(false);
+        users.setDob(user.getDob());
+        users.setSubscribed(true);
          repo.save(users);
          return "DONE";
     }
@@ -51,7 +56,25 @@ public class UserService {
         repo.save(users);
     }
 
+    public Users findByEmail(String email) {
+        return repo.findByEmail(email);
+    }
+
+    public List<Users> getUsersByIds(List<Long> ids) {
+        return repo.findAllById(ids);
+
+    }
+
     public void delete(Long id) {
         repo.deleteById(id);
+    }
+
+    public String unsubscribe(Long id) {
+        Users users = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        users.setSubscribed(false);
+        repo.save(users);
+
+        return "SUCCESSFULLY UNSUBSCRIBED";
     }
 }

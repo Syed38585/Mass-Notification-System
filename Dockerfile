@@ -1,14 +1,12 @@
-# Use official Java image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jdk
 
-# Set working directory
 WORKDIR /app
 
-# Copy jar file into container
-COPY target/mail-sender.jar app.jar
+COPY . .
 
-# Expose port
+RUN chmod +x mvnw
+RUN ./mvnw clean package -DskipTests
+
 EXPOSE 8080
 
-# Run application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","target/mailSender-0.0.1-SNAPSHOT.jar"]

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MailGen AI Dashboard</title>
+    <title>MAIL PILOT AI Dashboard</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -363,8 +363,8 @@
                     <span class="material-symbols-outlined text-white">mail</span>
                 </div>
                 <div>
-                    <h1 class="text-lg font-extrabold text-white tracking-tight">MailGen AI</h1>
-                    <p class="text-xs text-slate-400">Email Intelligence</p>
+                    <h1 class="text-lg font-extrabold text-white tracking-tight">MAIL PILOT AI</h1>
+                    <p class="text-xs text-slate-400">Automate workflows</p>
                 </div>
             </div>
         </div>
@@ -380,18 +380,18 @@
                 <span class="material-symbols-outlined">send</span> Mail Sender
             </button>
             <button onclick="showPage('ai')" data-page="ai" class="nav-item">
-                <span class="material-symbols-outlined">smart_toy</span> AI Assistant
+                <span class="material-symbols-outlined">smart_toy</span> AI AGENT
             </button>
             <button onclick="showPage('userList')" data-page="userList" class="nav-item">
                 <span class="material-symbols-outlined">group</span> User List
             </button>
-            <button onclick="showPage('emailOpens')" data-page="emailOpens" class="nav-item">
-                <span class="material-symbols-outlined">visibility</span> Email Opens
-            </button>
+<!--            <button onclick="showPage('emailOpens')" data-page="emailOpens" class="nav-item">-->
+<!--                <span class="material-symbols-outlined">visibility</span> Email Opens-->
+<!--            </button>-->
         </nav>
 
         <div class="p-5 border-t border-white/10">
-            <p class="text-xs text-slate-500 text-center">© 2026 MailGen AI</p>
+            <p class="text-xs text-slate-500 text-center">© 2026 MAIL PILOT AI</p>
         </div>
     </aside>
 
@@ -402,7 +402,7 @@
             <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-slate-100">
                 <span class="material-symbols-outlined">menu</span>
             </button>
-            <span class="font-bold text-slate-800">MailGen AI</span>
+            <span class="font-bold text-slate-800">MAIL PILOT AI</span>
         </header>
 
         <main class="flex-1 overflow-y-auto p-6 md:p-10">
@@ -457,13 +457,13 @@
                         </div>
                         <p id="lastDuration" class="text-2xl font-extrabold text-slate-900 mt-2">0 ms</p>
                     </div>
-                    <div class="stat-card" style="--accent:#16a34a">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-500">Email Opens</span>
-                            <span class="material-symbols-outlined text-green-600">visibility</span>
-                        </div>
-                        <p id="openCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
-                    </div>
+<!--                    <div class="stat-card" style="&#45;&#45;accent:#16a34a">-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-slate-500">Email Opens</span>-->
+<!--                            <span class="material-symbols-outlined text-green-600">visibility</span>-->
+<!--                        </div>-->
+<!--                        <p id="openCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>-->
+<!--                    </div>-->
                     <div class="stat-card" style="--accent:#2563eb">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-slate-500">Male Users</span>
@@ -478,13 +478,13 @@
                         </div>
                         <p id="femaleUsers" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
                     </div>
-                    <div class="stat-card" style="--accent:#059669">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-500">Open Rate</span>
-                            <span class="material-symbols-outlined text-emerald-600">percent</span>
-                        </div>
-                        <p id="openRate" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>
-                    </div>
+<!--                    <div class="stat-card" style="&#45;&#45;accent:#059669">-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-slate-500">Open Rate</span>-->
+<!--                            <span class="material-symbols-outlined text-emerald-600">percent</span>-->
+<!--                        </div>-->
+<!--                        <p id="openRate" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>-->
+<!--                    </div>-->
                     <div class="stat-card" style="--accent:#6366f1">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-slate-500">Avg Mails/User</span>
@@ -492,24 +492,25 @@
                         </div>
                         <p id="avgMailsPerUser" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
                     </div>
-                    <div class="stat-card" style="--accent:#0d9488">
+
+                    <div class="stat-card" style="--accent:#dc2626">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-500">Engagement</span>
-                            <span class="material-symbols-outlined text-teal-600">trending_up</span>
+                            <span class="text-sm font-medium text-slate-500">Bounce Rate</span>
+                            <span class="material-symbols-outlined text-red-500" style="font-size:18px">
+            unsubscribe
+        </span>
                         </div>
-                        <p id="engagementScore" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>
+                        <p id="bounceRate" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>
                     </div>
+<!--                    <div class="stat-card" style="&#45;&#45;accent:#0d9488">-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-slate-500">Engagement</span>-->
+<!--                            <span class="material-symbols-outlined text-teal-600">trending_up</span>-->
+<!--                        </div>-->
+<!--                        <p id="engagementScore" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>-->
+<!--                    </div>-->
                 </div>
 
-    <div class="mt-6 max-w-xs">
-        <div class="stat-card" style="--accent:#dc2626">
-            <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-slate-500">Bounce Rate</span>
-                <span class="material-symbols-outlined text-red-500" style="font-size:18px">unsubscribe</span>
-            </div>
-            <p id="bounceRate" class="text-lg font-extrabold text-slate-900 mt-1">0%</p>
-        </div>
-    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <div class="chart-card">
@@ -527,11 +528,11 @@
                         <p class="text-sm text-slate-500 mb-4">Male vs Female breakdown</p>
                         <canvas id="userDistributionChart" height="200"></canvas>
                     </div>
-                    <div class="chart-card">
-                        <h3 class="font-bold text-slate-800 mb-1">Engagement Analytics</h3>
-                        <p class="text-sm text-slate-500 mb-4">Opened vs not opened</p>
-                        <canvas id="engagementChart" height="200"></canvas>
-                    </div>
+<!--                    <div class="chart-card">-->
+<!--                        <h3 class="font-bold text-slate-800 mb-1">Engagement Analytics</h3>-->
+<!--                        <p class="text-sm text-slate-500 mb-4">Opened vs not opened</p>-->
+<!--                        <canvas id="engagementChart" height="200"></canvas>-->
+<!--                    </div>-->
                 </div>
             </section>
 
@@ -582,6 +583,19 @@
                         </select>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Date of Birth <span class="text-red-500">*</span>
+                        </label>
+
+                        <input
+                                id="regDob"
+                                type="date"
+                                class="field"
+                                required
+                        />
+                    </div>
+
                     <button
                             onclick="createUser()"
                             class="btn-primary w-full flex items-center justify-center gap-2">
@@ -611,6 +625,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Gender</th>
+                                <th>DOB</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
@@ -657,41 +672,101 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-3">Send To</label>
+
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">
+                            Send To
+                        </label>
+
                         <div class="flex flex-wrap gap-3">
+
                             <label class="radio-pill">
-                                <input type="radio" name="targetGroup" value="all" checked />
+                                <input type="radio" name="targetGroup" value="all" checked>
                                 <span>All Users</span>
                             </label>
+
                             <label class="radio-pill">
-                                <input type="radio" name="targetGroup" value="male" />
+                                <input type="radio" name="targetGroup" value="male">
                                 <span>Male</span>
                             </label>
+
                             <label class="radio-pill">
-                                <input type="radio" name="targetGroup" value="female" />
+                                <input type="radio" name="targetGroup" value="female">
                                 <span>Female</span>
                             </label>
+
                         </div>
+
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
-                        <button onclick="sendNow()" class="btn-primary flex-1 flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined" style="font-size:20px">send</span>
+                    <!-- Selected Users Section -->
+                    <div class="mt-6">
+
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">
+                            Or Select Specific Users
+                        </label>
+
+                        <button
+                                type="button"
+                                onclick="openUserSelectionModal()"
+                                class="btn-secondary flex items-center justify-center gap-2">
+
+                            <span class="material-symbols-outlined">groups</span>
+
+                            Select Users
+
+                        </button>
+
+                        <p id="selectedUserCount"
+                           class="mt-3 text-sm text-blue-600 font-semibold">
+
+                            No users selected
+
+                        </p>
+
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+
+                        <button
+                                onclick="sendNow()"
+                                class="btn-primary flex-1 flex items-center justify-center gap-2">
+
+        <span class="material-symbols-outlined"
+              style="font-size:20px">
+
+            send
+
+        </span>
+
                             Send Now
+
                         </button>
-                        <button onclick="openScheduleModal()" class="btn-secondary flex-1 flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined" style="font-size:20px">schedule</span>
+
+                        <button
+                                onclick="openScheduleModal()"
+                                class="btn-secondary flex-1 flex items-center justify-center gap-2">
+
+        <span class="material-symbols-outlined"
+              style="font-size:20px">
+
+            schedule
+
+        </span>
+
                             Schedule
+
                         </button>
+
                     </div>
                 </div>
-            </section>
+                </section>
 
             <!-- AI -->
             <section id="aiPage" class="hidden">
                 <div class="page-header">
-                    <h2>AI Assistant</h2>
-                    <p>Generate email content with artificial intelligence</p>
+                    <h2>AI AGENT</h2>
+                    <p>Automate your entire workflow at just a click</p>
                 </div>
                 <div class="panel p-8 max-w-2xl space-y-6">
                     <div>
@@ -769,8 +844,9 @@
 </div>
 
 <script>
-    // const API = "http://localhost:8080";
-    const API = "";
+    const API = "http://172.20.10.2:8080";
+    let selectedUsers = [];
+    // const API = "";
     let genderChart = null;
     let mailChart = null;
     let userDistributionChart = null;
@@ -783,7 +859,89 @@
         slate: "#94a3b8",
     };
 
-    document.addEventListener("DOMContentLoaded", loadAnalytics);
+    document.addEventListener("DOMContentLoaded", () => {
+
+        loadDashboardStats();
+
+        loadCharts();
+
+    });
+
+    async function loadDashboardStats() {
+
+        try {
+
+            const [
+                users,
+                mailCountRes,
+                mailTodayRes,
+                aiCountRes,
+                avgTimeRes,
+                lastDurationRes,
+                // opens,
+                // openRateRes,
+                avgMailsPerUserRes,
+                maleUsersRes,
+                femaleUsersRes
+            ] = await Promise.all([
+
+                safeFetch(`${API}/api/user/get/all`).then(r=>r.json()),
+                safeFetch(`${API}/api/analytics/mails/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/mails/daily`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/ai/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/average-time`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/last-duration`).then(r=>r.text()),
+                // safeFetch(`${API}/api/analytics/email-opens`).then(r=>r.json()),
+                // safeFetch(`${API}/api/analytics/open-rate`).then(r=>r.text()),
+                 safeFetch(`${API}/api/analytics/avg-mails-per-user`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/users/male/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/users/female/count`).then(r=>r.text())
+
+            ]);
+
+            userCount.innerText = users.length;
+            mailCount.innerText = mailCountRes;
+            mailToday.innerText = mailTodayRes;
+            aiCount.innerText = aiCountRes;
+            avgTime.innerText = avgTimeRes + " ms";
+            lastDuration.innerText = lastDurationRes + " ms";
+            // openCount.innerText = opens.length;
+            maleUsers.innerText = maleUsersRes;
+            femaleUsers.innerText = femaleUsersRes;
+            // openRate.innerText = Number(openRateRes).toFixed(1) + "%";
+            avgMailsPerUser.innerText =
+                Number(avgMailsPerUserRes).toFixed(1);
+
+            // engagementScore.innerText =
+            //     Number(openRateRes).toFixed(1) + "%";
+
+        }
+        catch(e){
+
+            console.error(e);
+
+        }
+
+    }
+
+    async function loadCharts(){
+
+        try{
+
+            const genderStats =
+                await safeFetch(
+                    `${API}/api/analytics/users/gender`
+                ).then(r=>r.json());
+
+            drawCharts(genderStats);
+
+        }
+        catch(e){
+
+            console.error(e);
+
+        }
+    }
 
     function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("open");
@@ -820,9 +978,25 @@
             document.getElementById("sidebar").classList.remove("open");
             document.getElementById("sidebarOverlay").classList.remove("open");
         }
+        if(page==="dashboard"){
 
-        if (page === "emailOpens") loadEmailOpens();
-        if (page === "userList") loadUsers();
+            loadDashboardStats();
+
+            loadCharts();
+
+        }
+
+        if(page==="userList"){
+
+            loadUsers();
+
+        }
+
+        if(page==="emailOpens"){
+
+            loadEmailOpens();
+
+        }
     }
 
     async function loadUsers() {
@@ -832,7 +1006,7 @@
             tbody.innerHTML = "";
 
             if (!users.length) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No users registered yet</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No users registered yet</td></tr>`;
                 return;
             }
 
@@ -842,16 +1016,31 @@
                     : `<span class="text-slate-400">—</span>`;
 
                 tbody.innerHTML += `
-          <tr>
-            <td class="font-mono text-slate-500">#${user.id}</td>
-            <td class="font-semibold">${escapeHtml(user.name)}</td>
-            <td>${escapeHtml(user.email)}</td>
-            <td>${genderBadge}</td>
-            <td class="space-x-2 whitespace-nowrap">
-              <button onclick="editUser(${user.id}, '${escapeAttr(user.name)}', '${escapeAttr(user.email)}', '${escapeAttr(user.gender || "")}')" class="btn-secondary btn-sm">Update</button>
-              <button onclick="deleteUser(${user.id})" class="btn-danger btn-sm">Delete</button>
-            </td>
-          </tr>`;
+    <tr>
+        <td class="font-mono text-slate-500">#${user.id}</td>
+        <td class="font-semibold">${escapeHtml(user.name)}</td>
+        <td>${escapeHtml(user.email)}</td>
+        <td>${genderBadge}</td>
+        <td>${user.dob || "—"}</td>
+        <td class="space-x-2 whitespace-nowrap">
+            <button
+                onclick="editUser(
+                    ${user.id},
+                    '${escapeAttr(user.name)}',
+                    '${escapeAttr(user.email)}',
+                    '${escapeAttr(user.gender || "")}'
+                )"
+                class="btn-secondary btn-sm">
+                Update
+            </button>
+
+            <button
+                onclick="deleteUser(${user.id})"
+                class="btn-danger btn-sm">
+                Delete
+            </button>
+        </td>
+    </tr>`;
             });
         } catch (e) {
             showToast("Failed to load users", "error");
@@ -886,7 +1075,11 @@
 
             showToast("User Updated Successfully ✅");
             loadUsers();
-            loadAnalytics();
+            loadUsers();
+
+            loadDashboardStats();
+
+            loadCharts();
         } catch (e) {
             showToast(e.message, "error");
         }
@@ -899,7 +1092,11 @@
             await safeFetch(`${API}/api/user/delete/${id}`, { method: "DELETE" });
             showToast("User Deleted Successfully ✅");
             loadUsers();
-            loadAnalytics();
+            loadUsers();
+
+            loadDashboardStats();
+
+            loadCharts();
         } catch (e) {
             showToast(e.message, "error");
         }
@@ -912,6 +1109,30 @@
             throw new Error(err);
         }
         return res;
+    }
+
+    function confirmSelectedUsers() {
+
+        selectedUsers = [];
+
+        document.querySelectorAll(".user-checkbox:checked").forEach(cb => {
+
+            selectedUsers.push({
+                id: Number(cb.dataset.id),
+                name: cb.dataset.name,
+                email: cb.dataset.email
+            });
+
+        });
+
+        document.getElementById("selectedUserCount").innerText =
+            selectedUsers.length === 0
+                ? "No users selected"
+                : `${selectedUsers.length} user(s) selected`;
+
+        closeUserSelectionModal();
+
+        showToast(`${selectedUsers.length} user(s) selected`);
     }
 
     function openScheduleModal() {
@@ -970,6 +1191,13 @@
         formData.append("subject", subject);
         formData.append("content", content);
         formData.append("sendAt", formatted);
+
+        if (selectedUsers.length > 0) {
+            selectedUsers.forEach(user => {
+                formData.append("recipientIds", user.id);
+            });
+        }
+
         if (image) formData.append("image", image);
         if (pdf) formData.append("pdf", pdf);
 
@@ -1027,90 +1255,193 @@
     }
 
     async function sendNow() {
+
         const subject = document.getElementById("mailSubject").value.trim();
         const content = document.getElementById("mailContent").value.trim();
         const image = document.getElementById("mailImage").files[0];
         const pdf = document.getElementById("mailPdf").files[0];
 
-        if (!subject) { showToast("Subject cannot be empty", "error"); return; }
-        if (!content) { showToast("Message cannot be empty", "error"); return; }
-
-        const target = document.querySelector('input[name="targetGroup"]:checked');
-        let url = `${API}/api/mail/dispatch`;
-        if (target && target.value !== "all") {
-            url += `?gender=${target.value}`;
+        if (!subject) {
+            showToast("Subject cannot be empty", "error");
+            return;
         }
 
+        if (!content) {
+            showToast("Message cannot be empty", "error");
+            return;
+        }
+
+        const target = document.querySelector(
+            'input[name="targetGroup"]:checked'
+        );
+
+        let url = `${API}/api/mail/dispatch`;
+
         const formData = new FormData();
+
         formData.append("subject", subject);
         formData.append("content", content);
-        if (image) formData.append("image", image);
-        if (pdf) formData.append("pdf", pdf);
 
-        showToast("Sending mail...");
+        // Selected Users
+        if (selectedUsers.length > 0) {
 
-        fetch(url, { method: "POST", body: formData })
-            .then(() => {
-                showToast("Mail Sent Successfully ✅");
-                clearMailForm();
-                setTimeout(loadAnalytics, 500);
+            selectedUsers.forEach(user => {
+                formData.append("recipientIds", user.id);
+            });
+
+        }
+        // Male / Female
+        else if (target && target.value !== "all") {
+
+            url += `?gender=${target.value}`;
+
+        }
+
+        if (image) {
+            formData.append("image", image);
+        }
+
+        if (pdf) {
+            formData.append("pdf", pdf);
+        }
+
+        // Show success immediately
+        showToast("Mail Sent Successfully ✅");
+
+        // Clear UI immediately
+        clearMailForm();
+
+        selectedUsers = [];
+
+        document.getElementById("selectedUserCount").innerText =
+            "No users selected";
+
+        // Send request in background
+        fetch(url, {
+            method: "POST",
+            body: formData
+        })
+            .then(async response => {
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                setTimeout(() => {
+                    loadDashboardStats();
+                    loadCharts();
+                }, 500);
+
             })
-            .catch((err) => showToast(err.message, "error"));
+            .catch(err => {
+
+                console.error(err);
+
+                showToast("Failed to send mail", "error");
+
+            });
+
     }
 
     async function createUser() {
+
         const name = regName.value.trim();
         const email = regEmail.value.trim();
         const gender = regGender.value.trim();
+        const dob = regDob.value;
 
         // Validate fields
-        if (!name || !email || !gender) {
+        if (!name || !email || !gender || !dob) {
             showToast("All fields are required.", "error");
             return;
         }
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         if (!emailRegex.test(email)) {
             showToast("Please enter a valid email address.", "error");
             return;
         }
 
         try {
+
             await safeFetch(`${API}/api/user/create/user`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name,
-                    email,
-                    gender,
-                }),
+                    name: name,
+                    email: email,
+                    gender: gender,
+                    dob: dob
+                })
             });
 
             showToast("User Created Successfully ✅");
 
+            // Clear fields
             regName.value = "";
             regEmail.value = "";
             regGender.value = "";
+            regDob.value = "";
 
-            loadAnalytics();
+            loadUsers();
+            loadDashboardStats();
+            loadCharts();
+
         } catch (e) {
             alert(e.message);
         }
     }
+
     async function generateAI() {
-        if (!aiPrompt.value) { showToast("Enter prompt", "error"); return; }
+
+        if (!aiPrompt.value) {
+            showToast("Enter prompt", "error");
+            return;
+        }
+
         aiResponseWrapper.classList.remove("hidden");
-        aiResponse.innerText = "Generating...";
+        aiResponse.innerText = "";
+
         try {
-            const res = await safeFetch(`${API}/api/ai/get?prompt=${encodeURIComponent(aiPrompt.value)}`);
-            aiResponse.innerText = await res.text();
+
+            const response = await fetch(
+                `${API}/api/ai/get?prompt=${encodeURIComponent(aiPrompt.value)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+
+                const { value, done } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                const chunk = decoder.decode(value, {
+                    stream: true
+                });
+
+                aiResponse.innerText += chunk;
+            }
+
             showToast("AI Generated");
-            loadAnalytics();
+            loadDashboardStats();
+
         } catch (e) {
+
+            console.error(e);
             showToast(e.message, "error");
+
         }
     }
 
@@ -1124,40 +1455,25 @@
         plugins: { legend: { labels: { font: { family: "Plus Jakarta Sans", size: 12 }, padding: 16 } } },
     };
 
-    async function loadAnalytics() {
-        try {
-            const [
-                users, mailCountRes, mailTodayRes, aiCountRes, avgTimeRes,
-                lastDurationRes, genderStats, opens, openRateRes,
-                avgMailsPerUserRes, maleUsersRes, femaleUsersRes,
-            ] = await Promise.all([
-                safeFetch(`${API}/api/user/get/all`).then((r) => r.json()),
-                safeFetch(`${API}/api/analytics/mails/count`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/mails/daily`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/ai/count`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/average-time`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/last-duration`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/users/gender`).then((r) => r.json()),
-                safeFetch(`${API}/api/analytics/email-opens`).then((r) => r.json()),
-                safeFetch(`${API}/api/analytics/open-rate`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/avg-mails-per-user`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/users/male/count`).then((r) => r.text()),
-                safeFetch(`${API}/api/analytics/users/female/count`).then((r) => r.text()),
-            ]);
+    async function drawCharts() {
 
-            bounceRate.innerText = "0%";
-            userCount.innerText = users?.length || 0;
-            mailCount.innerText = parseInt(mailCountRes) || 0;
-            mailToday.innerText = parseInt(mailTodayRes) || 0;
-            aiCount.innerText = parseInt(aiCountRes) || 0;
-            avgTime.innerText = (parseInt(avgTimeRes) || 0) + " ms";
-            lastDuration.innerText = (parseInt(lastDurationRes) || 0) + " ms";
-            openCount.innerText = opens?.length || 0;
-            maleUsers.innerText = parseInt(maleUsersRes) || 0;
-            femaleUsers.innerText = parseInt(femaleUsersRes) || 0;
-            openRate.innerText = (Number(openRateRes) || 0).toFixed(1) + "%";
-            avgMailsPerUser.innerText = (Number(avgMailsPerUserRes) || 0).toFixed(1);
-            engagementScore.innerText = (Number(openRateRes) || 0).toFixed(1) + "%";
+        try {
+
+            const [
+                genderStats,
+                opens,
+                mailCountRes,
+                maleUsersRes,
+                femaleUsersRes
+            ] = await Promise.all([
+
+                safeFetch(`${API}/api/analytics/users/gender`).then(r => r.json()),
+                safeFetch(`${API}/api/analytics/email-opens`).then(r => r.json()),
+                safeFetch(`${API}/api/analytics/mails/count`).then(r => r.text()),
+                safeFetch(`${API}/api/analytics/users/male/count`).then(r => r.text()),
+                safeFetch(`${API}/api/analytics/users/female/count`).then(r => r.text())
+
+            ]);
 
             if (genderChart) genderChart.destroy();
             genderChart = new Chart(document.getElementById("genderChart"), {
@@ -1167,12 +1483,10 @@
                     datasets: [{
                         label: "Users",
                         data: [genderStats.male || 0, genderStats.female || 0],
-                        backgroundColor: [CHART_COLORS.primary, CHART_COLORS.pink],
-                        borderRadius: 8,
-                        borderSkipped: false,
-                    }],
+                        backgroundColor: [CHART_COLORS.primary, CHART_COLORS.pink]
+                    }]
                 },
-                options: { ...chartDefaults, scales: { y: { beginAtZero: true, grid: { color: "#f1f5f9" } }, x: { grid: { display: false } } } },
+                options: chartDefaults
             });
 
             if (userDistributionChart) userDistributionChart.destroy();
@@ -1181,13 +1495,17 @@
                 data: {
                     labels: ["Male", "Female"],
                     datasets: [{
-                        data: [parseInt(maleUsersRes) || 0, parseInt(femaleUsersRes) || 0],
-                        backgroundColor: [CHART_COLORS.primary, CHART_COLORS.pink],
-                        borderWidth: 0,
-                        hoverOffset: 8,
-                    }],
+                        data: [
+                            Number(maleUsersRes),
+                            Number(femaleUsersRes)
+                        ],
+                        backgroundColor: [
+                            CHART_COLORS.primary,
+                            CHART_COLORS.pink
+                        ]
+                    }]
                 },
-                options: { ...chartDefaults, cutout: "65%" },
+                options: chartDefaults
             });
 
             if (mailChart) mailChart.destroy();
@@ -1196,17 +1514,13 @@
                 data: {
                     labels: ["Today"],
                     datasets: [{
-                        label: "Mails Today",
-                        data: [parseInt(mailTodayRes) || 0],
+                        label: "Mails",
+                        data: [Number(mailCountRes)],
                         borderColor: CHART_COLORS.primary,
-                        backgroundColor: "rgba(37, 99, 235, 0.1)",
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointBackgroundColor: CHART_COLORS.primary,
-                    }],
+                        fill: true
+                    }]
                 },
-                options: { ...chartDefaults, scales: { y: { beginAtZero: true, grid: { color: "#f1f5f9" } }, x: { grid: { display: false } } } },
+                options: chartDefaults
             });
 
             if (engagementChart) engagementChart.destroy();
@@ -1217,19 +1531,118 @@
                     datasets: [{
                         data: [
                             opens.length,
-                            Math.max(0, (parseInt(mailCountRes) || 0) - opens.length),
+                            Math.max(0, Number(mailCountRes) - opens.length)
                         ],
-                        backgroundColor: [CHART_COLORS.green, CHART_COLORS.slate],
-                        borderWidth: 0,
-                        hoverOffset: 8,
-                    }],
+                        backgroundColor: [
+                            CHART_COLORS.green,
+                            CHART_COLORS.slate
+                        ]
+                    }]
                 },
-                options: chartDefaults,
+                options: chartDefaults
             });
+
         } catch (e) {
-            console.error("Analytics load failed:", e);
-            showToast("Failed to load analytics", "error");
+
+            console.error(e);
+
         }
+    }
+
+    function renderUserSelection(users) {
+
+        const div = document.getElementById("userListContainer");
+
+        div.innerHTML = "";
+
+        users.forEach(user => {
+
+            const isSelected = selectedUsers.some(
+                selected => selected.id === user.id
+            );
+
+            div.innerHTML += `
+<label
+style="
+display:flex;
+padding:10px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+align-items:center;
+">
+
+<input
+class="user-checkbox"
+type="checkbox"
+data-id="${user.id}"
+data-name="${user.name}"
+data-email="${user.email}"
+${isSelected ? "checked" : ""}
+style="margin-right:12px;">
+
+<div>
+
+<b>${user.name}</b><br>
+
+<small>${user.email}</small>
+
+</div>
+
+</label>
+`;
+
+        });
+
+    }
+    function filterUsers(){
+
+        const keyword =
+            document
+                .getElementById("userSearch")
+                .value
+                .toLowerCase();
+
+        const filtered =
+            allUsers.filter(u=>
+
+                u.name.toLowerCase().includes(keyword)
+
+                ||
+
+                u.email.toLowerCase().includes(keyword)
+
+            );
+
+        renderUserSelection(filtered);
+
+    }
+
+    let allUsers = [];
+
+    async function openUserSelectionModal() {
+
+        document
+            .getElementById("userSelectionModal")
+            .classList
+            .add("open");
+
+        if (allUsers.length === 0) {
+
+            allUsers = await safeFetch(
+                `${API}/api/user/get/all`
+            ).then(r => r.json());
+
+        }
+
+        renderUserSelection(allUsers);
+    }
+
+    function closeUserSelectionModal() {
+
+        document
+            .getElementById("userSelectionModal")
+            .classList
+            .remove("open");
     }
 
     async function loadEmailOpens() {
@@ -1256,5 +1669,51 @@
     }
 </script>
 
+<div id="userSelectionModal"
+     class="modal-backdrop">
+
+    <div class="modal-box"
+         style="max-width:700px">
+
+        <h2 class="text-xl font-bold mb-4">
+            Select Users
+        </h2>
+
+        <input
+                id="userSearch"
+                class="field mb-4"
+                placeholder="Search user..."
+                onkeyup="filterUsers()">
+
+        <div
+                id="userListContainer"
+                style="max-height:350px;
+                       overflow:auto">
+
+        </div>
+
+        <div class="flex gap-3 mt-5">
+
+            <button
+                    class="btn-primary"
+                    onclick="confirmSelectedUsers()">
+
+                Confirm
+
+            </button>
+
+            <button
+                    class="btn-secondary"
+                    onclick="closeUserSelectionModal()">
+
+                Cancel
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 </body>
 </html>
