@@ -20,4 +20,6 @@ public class Users {
     String gender;
     boolean isSubscribed;
     String dob;
+    String country;
+    int age;
 }

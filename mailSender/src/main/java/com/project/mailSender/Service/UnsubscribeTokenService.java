@@ -16,7 +16,7 @@ public class UnsubscribeTokenService {
     private final SecretKey secretKey;
 
     public UnsubscribeTokenService(
-            @Value("${unsubscribe.jwt.secret}") String secret
+            @Value("${jwt.secret}") String secret
     ) {
 
         if (secret == null || secret.length() < 32) {
@@ -70,32 +70,21 @@ public class UnsubscribeTokenService {
     public Long validateToken(String token) {
 
         Claims claims = Jwts.parser()
-
                 .verifyWith(secretKey)
-
                 .build()
-
                 .parseSignedClaims(token)
-
                 .getPayload();
 
+        String purpose = claims.get("purpose", String.class);
 
-        String purpose = claims.get(
-                "purpose",
-                String.class
-        );
-
-
-        if (!"unsubscribe".equals(purpose)) {
-
-            throw new IllegalArgumentException(
-                    "Invalid unsubscribe token"
-            );
+        if (purpose == null) {
+            purpose = claims.get("token_type", String.class);
         }
 
+        if (!"unsubscribe".equals(purpose)) {
+            throw new IllegalArgumentException("Invalid unsubscribe token");
+        }
 
-        return Long.parseLong(
-                claims.getSubject()
-        );
+        return Long.parseLong(claims.getSubject());
     }
 }

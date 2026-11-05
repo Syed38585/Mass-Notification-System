@@ -15,7 +15,7 @@ public class AsyncConfig {
     public Executor mailExecutor() {
 
             ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-            scheduler.setPoolSize(25);
+            scheduler.setPoolSize(30);
             scheduler.setThreadNamePrefix("MailScheduler-");
             scheduler.initialize();
             return scheduler;

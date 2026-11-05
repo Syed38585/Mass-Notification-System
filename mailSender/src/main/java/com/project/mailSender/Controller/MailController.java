@@ -1,15 +1,20 @@
 package com.project.mailSender.Controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.mailSender.MailService.MailService;
 import com.project.mailSender.Model.MailRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,66 +27,57 @@ public class MailController {
     @Autowired
     private MailService mailService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
 
     @PostMapping(value = "/dispatch", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, Object>> dispatchMail(
-
             @ModelAttribute MailRequest mailRequest,
-
             @RequestParam(required = false) String gender,
-
             @RequestParam(required = false) List<Long> recipientIds,
-
             @RequestParam(required = false) MultipartFile image,
-
-            @RequestParam(required = false) MultipartFile pdf
-
-    ) {
+            @RequestParam(required = false) MultipartFile pdf) {
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-
-            if (mailRequest.getSubject() == null ||
-                    mailRequest.getSubject().isBlank()) {
-
-                return ResponseEntity.badRequest()
-                        .body(error("Subject cannot be empty"));
+            if (mailRequest.getSubject() == null
+                    || mailRequest.getSubject().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Email subject is required.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            if (mailRequest.getContent() == null ||
-                    mailRequest.getContent().isBlank()) {
-
-                return ResponseEntity.badRequest()
-                        .body(error("Content cannot be empty"));
+            if (mailRequest.getContent() == null
+                    || mailRequest.getContent().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Email content is required.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            if (mailRequest.getSendAt() != null &&
-                    mailRequest.getSendAt().isBefore(LocalDateTime.now())) {
+            // LocalDateTime.now(ZoneId) already returns LocalDateTime.
+            // Do not append .toLocalDateTime() here.
+            LocalDateTime nowIST = LocalDateTime.now(IST_ZONE);
 
-                return ResponseEntity.badRequest()
-                        .body(error("Scheduled time must be in the future"));
+            if (mailRequest.getSendAt() != null
+                    && mailRequest.getSendAt().isBefore(nowIST)) {
+                response.put("success", false);
+                response.put("message", "Scheduled time must be in the future.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // IMPORTANT
-            // Convert repeated recipientIds parameters into MailRequest
             if (recipientIds != null && !recipientIds.isEmpty()) {
                 mailRequest.setRecipientIds(recipientIds);
             }
 
             byte[] imageBytes = null;
-            byte[] pdfBytes = null;
-
             String imageName = null;
-            String pdfName = null;
-
             if (image != null && !image.isEmpty()) {
                 imageBytes = image.getBytes();
                 imageName = image.getOriginalFilename();
             }
 
+            byte[] pdfBytes = null;
+            String pdfName = null;
             if (pdf != null && !pdf.isEmpty()) {
                 pdfBytes = pdf.getBytes();
                 pdfName = pdf.getOriginalFilename();
@@ -96,68 +92,26 @@ public class MailController {
                     pdfName
             );
 
-            response.put("status", "SUCCESS");
-
-            if (mailRequest.getRecipientIds() != null &&
-                    !mailRequest.getRecipientIds().isEmpty()) {
-
-                response.put("target", "Selected Users");
-                response.put(
-                        "selectedCount",
-                        mailRequest.getRecipientIds().size()
-                );
-
-            } else if (gender != null && !gender.isBlank()
-                    && !gender.equalsIgnoreCase("all")) {
-
-                response.put("target", gender);
-
+            response.put("success", true);
+            if (mailRequest.getSendAt() != null) {
+                response.put("message", "Email campaign scheduled successfully.");
+                response.put("scheduledAt", mailRequest.getSendAt());
             } else {
-
-                response.put("target", "All Users");
+                response.put("message", "Email campaign submitted successfully.");
             }
 
-            if (mailRequest.getSendAt() == null) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
 
-                response.put(
-                        "message",
-                        "Emails are being sent."
-                );
-
-            } else {
-
-                response.put(
-                        "message",
-                        "Email scheduled successfully."
-                );
-
-                response.put(
-                        "scheduledFor",
-                        mailRequest.getSendAt()
-                );
-            }
-
-            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
 
         } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity.internalServerError()
-                    .body(error(
-                            "Failed to process mail request : "
-                                    + e.getMessage()
-                    ));
+            response.put("success", false);
+            response.put("message", "Failed to process email campaign.");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    private Map<String, Object> error(String message) {
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("status", "ERROR");
-        map.put("message", message);
-
-        return map;
     }
 }

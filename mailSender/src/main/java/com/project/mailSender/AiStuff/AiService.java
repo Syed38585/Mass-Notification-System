@@ -32,18 +32,16 @@ public class AiService {
 
     private final AnalyticsAgent analyticsAgent;
 
-    private final UserService userService;
 
     private final AiLogRepo aiLogRepo;
 
     List<Message> list = new ArrayList<>();
 
-    public AiService(ChatClient.Builder builder, GetUserInfo getUserInfo, EmailTool emailTool, AnalyticsAgent analyticsAgent, UserService userService, AiLogRepo aiLogRepo) {
+    public AiService(ChatClient.Builder builder, GetUserInfo getUserInfo, EmailTool emailTool, AnalyticsAgent analyticsAgent, AiLogRepo aiLogRepo) {
         this.chatClient = builder.build();
         this.getUserInfo = getUserInfo;
         this.emailTool = emailTool;
         this.analyticsAgent = analyticsAgent;
-        this.userService = userService;
         this.aiLogRepo = aiLogRepo;
     }
 

@@ -5,12 +5,8 @@ import com.project.mailSender.Model.UserDto;
 import com.project.mailSender.Model.Users;
 import com.project.mailSender.Repository.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,8 +25,10 @@ public class UserService {
         users.setEmail(user.getEmail().toLowerCase());
         users.setGender(user.getGender().toLowerCase());
         users.setDob(user.getDob());
+        users.setAge(user.getAge());
+        users.setCountry(user.getCountry());
         users.setSubscribed(true);
-         repo.save(users);
+        repo.save(users);
          return "DONE";
     }
 
@@ -51,6 +49,10 @@ public class UserService {
 
         if(updateDto.getGender()!=null){
             users.setGender(updateDto.getGender().toLowerCase());
+        }
+
+        if (updateDto.getAge() != null){
+            users.setAge(updateDto.getAge());
         }
 
         repo.save(users);
@@ -76,5 +78,27 @@ public class UserService {
         repo.save(users);
 
         return "SUCCESSFULLY UNSUBSCRIBED";
+    }
+
+    public String updateStatus(Long id) {
+        Users users = repo.findById(id).orElseThrow(() ->
+                new RuntimeException("User not found in DB"));
+
+            users.setSubscribed(true);
+            repo.save(users);
+            return "User Subscribed successfully";
+    }
+
+    public String updateStatusDisable(Long id) {
+        Users users = repo.findById(id).orElseThrow(() ->
+                new RuntimeException("User not found in DB"));
+
+        users.setSubscribed(false);
+        repo.save(users);
+        return "User un-Subscribed successfully";
+    }
+
+    public List<Users> getUsersByCountry(String country) {
+        return repo.findByCountry(country);
     }
 }

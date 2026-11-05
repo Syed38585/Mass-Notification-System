@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAIL PILOT AI Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: "#2563eb", dark: "#1d4ed8", light: "#3b82f6" },
+                        surface: "#ffffff",
+                        canvas: "#f1f5f9",
+                        sidebar: "#0f172a",
+                    },
+                    fontFamily: { display: ["Plus Jakarta Sans", "sans-serif"] },
+                    boxShadow: {
+                        card: "0 4px 24px -4px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04)",
+                        glow: "0 0 40px -8px rgba(37, 99, 235, 0.35)",
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; }
+
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        /* Sidebar */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .nav-item.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(59, 130, 246, 0.15));
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 16px -4px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Cards */
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--accent, #2563eb);
+            opacity: 0.85;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.12);
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.06);
+        }
+
+        .field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #f8fafc;
+        }
+        .field:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            background: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            padding: 13px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px -2px rgba(37, 99, 235, 0.45);
+        }
+        .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-secondary {
+            background: #fff;
+            color: #2563eb;
+            padding: 13px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 2px solid #2563eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: #eff6ff; }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 14px 22px;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.25);
+            display: none;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 360px;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .subscription-badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .subscription-badge.subscribed {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .subscription-badge.unsubscribed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Tables */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .data-table thead th:first-child { border-radius: 12px 0 0 0; }
+        .data-table thead th:last-child { border-radius: 0 12px 0 0; }
+        .data-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+        .data-table tbody tr:hover td { background: #f8fafc; }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            z-index: 40;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 24px 64px -12px rgba(15, 23, 42, 0.25);
+            width: 100%;
+            max-width: 420px;
+            animation: popIn 0.25s ease;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Radio pills */
+        .radio-pill input { display: none; }
+        .radio-pill span {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        .radio-pill input:checked + span {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        /* Scheduled widget */
+        #scheduledMailWidget {
+            animation: slideIn 0.35s ease;
+        }
+
+        /* Mobile sidebar */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+                z-index: 50;
+                transition: left 0.3s ease;
+            }
+            #sidebar.open { left: 0; }
+            #sidebarOverlay { display: none; }
+            #sidebarOverlay.open {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 45;
+            }
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+        .page-header p {
+            color: #64748b;
+            margin-top: 4px;
+            font-size: 0.95rem;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.06);
+        }
+
+        .ai-response-box {
+            background: linear-gradient(135deg, #f8fafc, #eff6ff);
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 24px;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            background: #f8fafc;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+        .file-upload:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .file-upload input { display: none; }
+        .auth-shell { min-height: 100vh; background: radial-gradient(circle at top right, #dbeafe 0, #f8fafc 38%, #eef2ff 100%); }
+        .auth-card { width: min(100% - 32px, 480px); border: 1px solid #e2e8f0; border-radius: 24px; background: white; box-shadow: 0 24px 80px -30px rgba(15,23,42,.25); }
+        .btn-subscribe { background: linear-gradient(135deg,#059669,#047857); color:#fff; padding:8px 12px; border-radius:10px; font-weight:600; font-size:.85rem; border:0; cursor:pointer; }
+        .btn-subscribe:hover { filter:brightness(1.08); }
+    </style>
+</head>
+
+<body class="bg-canvas font-display text-slate-800 antialiased">
+
+<!-- LOGIN / REGISTER GATE -->
+<section id="authPage" class="auth-shell flex items-center justify-center py-10">
+    <div class="auth-card p-8 sm:p-10">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-glow"><span class="material-symbols-outlined text-white">mail</span></div>
+            <div><h1 class="text-xl font-extrabold text-slate-900">MAIL PILOT AI</h1><p class="text-sm text-slate-500">Sign in to manage your mail workflows</p></div>
+        </div>
+        <div class="flex gap-2 p-1 rounded-xl bg-slate-100 mb-6">
+            <button id="loginTab" type="button" onclick="setAuthMode('login')" class="flex-1 rounded-lg py-3 font-semibold bg-white shadow-sm text-blue-700">Login</button>
+            <button id="registerTab" type="button" onclick="setAuthMode('register')" class="flex-1 rounded-lg py-3 font-semibold text-slate-500">Register</button>
+        </div>
+        <form id="authForm" class="space-y-4" onsubmit="submitAuth(event)">
+            <div id="authNameWrap" class="hidden"><label class="block text-sm font-semibold mb-2" for="authName">Full name</label><input id="authName" class="field" autocomplete="name" placeholder="Your full name" /></div>
+            <div><label class="block text-sm font-semibold mb-2" for="authEmail">Email address</label><input id="authEmail" type="email" class="field" autocomplete="username" placeholder="you@example.com" required /></div>
+            <div><label class="block text-sm font-semibold mb-2" for="authPassword">Password</label><input id="authPassword" type="password" class="field" autocomplete="current-password" placeholder="Enter your password" required minlength="6" /></div>
+            <p id="authError" class="hidden text-sm text-red-600"></p>
+            <button id="authSubmit" type="submit" class="btn-primary w-full">Login</button>
+        </form>
+        <p class="text-xs text-slate-400 mt-6 text-center">Your session is authenticated using a JWT.</p>
+    </div>
+</section>
+
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Scheduled Mail Widget -->
+<div id="scheduledMailWidget"
+     class="fixed top-5 right-5 bg-gradient-to-br from-blue-600 to-blue-700 text-white p-5 rounded-2xl shadow-glow hidden z-50 min-w-[320px] border border-blue-400/30">
+    <div class="flex justify-between items-center">
+    <span class="font-bold flex items-center gap-2">
+      <span class="material-symbols-outlined text-white" style="font-size:20px">schedule_send</span>
+      Scheduled Mail
+    </span>
+        <button onclick="hideScheduledWidget()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition">
+            <span class="material-symbols-outlined text-white" style="font-size:18px">close</span>
+        </button>
+    </div>
+    <div class="mt-3 text-sm space-y-1">
+        <p id="scheduledSubject" class="font-medium">No scheduled mails</p>
+        <p id="scheduledTime" class="text-blue-100"></p>
+    </div>
+</div>
+
+<!-- Mobile overlay -->
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div id="appShell" class="flex h-screen overflow-hidden hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-[270px] bg-sidebar flex flex-col shrink-0 shadow-2xl">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-glow">
+                    <span class="material-symbols-outlined text-white">mail</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-white tracking-tight">MAIL PILOT AI</h1>
+                    <p class="text-xs text-slate-400">Automate workflows</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1">
+            <button onclick="showPage('dashboard')" data-page="dashboard" class="nav-item active">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </button>
+            <button onclick="showPage('register')" data-page="register" class="nav-item">
+                <span class="material-symbols-outlined">person_add</span> User Registration
+            </button>
+            <button onclick="showPage('mailer')" data-page="mailer" class="nav-item">
+                <span class="material-symbols-outlined">send</span> Mail Sender
+            </button>
+            <button onclick="showPage('ai')" data-page="ai" class="nav-item">
+                <span class="material-symbols-outlined">smart_toy</span> AI AGENT
+            </button>
+            <button onclick="showPage('userList')" data-page="userList" class="nav-item">
+                <span class="material-symbols-outlined">group</span> User List
+            </button>
+            <!--            <button onclick="showPage('emailOpens')" data-page="emailOpens" class="nav-item">-->
+            <!--                <span class="material-symbols-outlined">visibility</span> Email Opens-->
+            <!--            </button>-->
+        </nav>
+
+        <div class="p-5 border-t border-white/10 space-y-3">
+            <p id="signedInAs" class="text-xs text-slate-400 text-center truncate"></p>
+            <button onclick="logout()" class="w-full rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10">Sign out</button>
+            <p class="text-xs text-slate-500 text-center">© 2026 MAIL PILOT AI</p>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar (mobile) -->
+        <header class="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200">
+            <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-slate-100">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <span class="font-bold text-slate-800">MAIL PILOT AI</span>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+
+            <!-- DASHBOARD -->
+            <section id="dashboardPage">
+                <div class="page-header">
+                    <h2>Overview</h2>
+                    <p>Real-time analytics and performance metrics</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="stat-card" style="--accent:#2563eb">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Total Users</span>
+                            <span class="material-symbols-outlined text-blue-500">group</span>
+                        </div>
+                        <p id="userCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#7c3aed">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Total Mails Sent</span>
+                            <span class="material-symbols-outlined text-violet-500">mail</span>
+                        </div>
+                        <p id="mailCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#0891b2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Mails Sent Today</span>
+                            <span class="material-symbols-outlined text-cyan-600">today</span>
+                        </div>
+                        <p id="mailToday" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#db2777">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">AI Requests</span>
+                            <span class="material-symbols-outlined text-pink-600">psychology</span>
+                        </div>
+                        <p id="aiCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#ea580c">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Avg Send Time</span>
+                            <span class="material-symbols-outlined text-orange-500">timer</span>
+                        </div>
+                        <p id="avgTime" class="text-2xl font-extrabold text-slate-900 mt-2">0 ms</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#ca8a04">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Last Duration</span>
+                            <span class="material-symbols-outlined text-yellow-600">speed</span>
+                        </div>
+                        <p id="lastDuration" class="text-2xl font-extrabold text-slate-900 mt-2">0 ms</p>
+                    </div>
+                    <!--                    <div class="stat-card" style="&#45;&#45;accent:#16a34a">-->
+                    <!--                        <div class="flex items-center justify-between">-->
+                    <!--                            <span class="text-sm font-medium text-slate-500">Email Opens</span>-->
+                    <!--                            <span class="material-symbols-outlined text-green-600">visibility</span>-->
+                    <!--                        </div>-->
+                    <!--                        <p id="openCount" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>-->
+                    <!--                    </div>-->
+                    <div class="stat-card" style="--accent:#2563eb">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Male Users</span>
+                            <span class="material-symbols-outlined text-blue-500">male</span>
+                        </div>
+                        <p id="maleUsers" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="stat-card" style="--accent:#ec4899">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Female Users</span>
+                            <span class="material-symbols-outlined text-pink-500">female</span>
+                        </div>
+                        <p id="femaleUsers" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+                    <!--                    <div class="stat-card" style="&#45;&#45;accent:#059669">-->
+                    <!--                        <div class="flex items-center justify-between">-->
+                    <!--                            <span class="text-sm font-medium text-slate-500">Open Rate</span>-->
+                    <!--                            <span class="material-symbols-outlined text-emerald-600">percent</span>-->
+                    <!--                        </div>-->
+                    <!--                        <p id="openRate" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>-->
+                    <!--                    </div>-->
+                    <div class="stat-card" style="--accent:#6366f1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Avg Mails/User</span>
+                            <span class="material-symbols-outlined text-indigo-500">calculate</span>
+                        </div>
+                        <p id="avgMailsPerUser" class="text-2xl font-extrabold text-slate-900 mt-2">0</p>
+                    </div>
+
+                    <div class="stat-card" style="--accent:#dc2626">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-500">Bounce Rate</span>
+                            <span class="material-symbols-outlined text-red-500" style="font-size:18px">
+            unsubscribe
+        </span>
+                        </div>
+                        <p id="bounceRate" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>
+                    </div>
+                    <!--                    <div class="stat-card" style="&#45;&#45;accent:#0d9488">-->
+                    <!--                        <div class="flex items-center justify-between">-->
+                    <!--                            <span class="text-sm font-medium text-slate-500">Engagement</span>-->
+                    <!--                            <span class="material-symbols-outlined text-teal-600">trending_up</span>-->
+                    <!--                        </div>-->
+                    <!--                        <p id="engagementScore" class="text-2xl font-extrabold text-slate-900 mt-2">0%</p>-->
+                    <!--                    </div>-->
+                </div>
+
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <div class="chart-card">
+                        <h3 class="font-bold text-slate-800 mb-1">Gender Distribution</h3>
+                        <p class="text-sm text-slate-500 mb-4">Users by gender</p>
+                        <canvas id="genderChart" height="200"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="font-bold text-slate-800 mb-1">Mail Activity (Today)</h3>
+                        <p class="text-sm text-slate-500 mb-4">Emails sent today</p>
+                        <canvas id="mailChart" height="200"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="font-bold text-slate-800 mb-1">User Distribution</h3>
+                        <p class="text-sm text-slate-500 mb-4">Male vs Female breakdown</p>
+                        <canvas id="userDistributionChart" height="200"></canvas>
+                    </div>
+                    <!--                    <div class="chart-card">-->
+                    <!--                        <h3 class="font-bold text-slate-800 mb-1">Engagement Analytics</h3>-->
+                    <!--                        <p class="text-sm text-slate-500 mb-4">Opened vs not opened</p>-->
+                    <!--                        <canvas id="engagementChart" height="200"></canvas>-->
+                    <!--                    </div>-->
+                </div>
+            </section>
+
+            <!-- REGISTER -->
+            <section id="registerPage" class="hidden">
+                <div class="page-header">
+                    <h2>User Registration</h2>
+                    <p>Add a new recipient to your mailing list</p>
+                </div>
+
+                <div class="panel p-8 max-w-xl space-y-5">
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Full Name <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                                id="regName"
+                                type="text"
+                                placeholder="John Doe"
+                                class="field"
+                                required
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Email Address <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                                id="regEmail"
+                                type="email"
+                                placeholder="john@example.com"
+                                class="field"
+                                required
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+
+                        <select id="regGender" class="field" required>
+                            <option value="" selected disabled>Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Date of Birth <span class="text-red-500">*</span>
+                        </label>
+
+                        <input
+                                id="regDob"
+                                type="date"
+                                class="field"
+                                required
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2" for="regAge">Age <span class="text-red-500">*</span></label>
+                        <input id="regAge" type="number" min="1" max="120" class="field" placeholder="Enter age" required />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2" for="regCountry">Country <span class="text-red-500">*</span></label>
+                        <select id="regCountry" class="field" required><option value="" selected disabled>Loading countries...</option></select>
+                    </div>
+
+                    <button
+                            onclick="createUser()"
+                            class="btn-primary w-full flex items-center justify-center gap-2">
+
+            <span class="material-symbols-outlined" style="font-size:20px">
+                person_add
+            </span>
+
+                        Create User
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- USER LIST -->
+            <section id="userListPage" class="hidden">
+                <div class="page-header">
+                    <h2>All Users</h2>
+                    <p>Manage your registered recipients</p>
+                </div>
+                <div class="panel overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Gender</th>
+                                <th>DOB</th>
+                                <th>Age</th>
+                                <th>Country</th>
+                                <th>Subscription</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MAILER -->
+            <section id="mailerPage" class="hidden">
+                <div class="page-header">
+                    <h2>Mail Sender</h2>
+                    <p>Compose and dispatch emails to your audience</p>
+                </div>
+                <div class="panel p-8 max-w-2xl space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Subject</label>
+                        <input id="mailSubject" class="field" placeholder="Enter email subject" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Message</label>
+                        <textarea id="mailContent" class="field h-40 resize-y" placeholder="Write your message..."></textarea>
+                    </div>
+
+
+                    <!-- AI SPAM FILTER -->
+                    <div id="spamChecker" class="rounded-xl border border-slate-200 bg-slate-50 p-5 space-y-4">
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-800">AI Spam Filter</h3>
+                                <p class="text-sm text-slate-500">
+                                    Analyzes your email as you type
+                                </p>
+                            </div>
+                            <span class="material-symbols-outlined text-blue-600">shield</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Spam Probability</span>
+                            <span id="spamPercentage" class="font-bold text-lg">0%</span>
+                        </div>
+
+                        <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div id="spamProgress"
+                                 class="h-full rounded-full transition-all duration-300"
+                                 style="width: 0%">
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-sm text-slate-600">Risk Level: </span>
+                            <span id="spamRisk" class="font-semibold text-slate-500">
+            Waiting for input
+        </span>
+                        </div>
+
+                        <div>
+                            <h4 class="mb-2 text-sm font-semibold text-slate-700">
+                                Flagged Indicators
+                            </h4>
+                            <div id="spamKeywords" class="flex flex-wrap gap-2 text-sm text-slate-500">
+                                No keywords detected yet.
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="mb-2 text-sm font-semibold text-slate-700">
+                                Suggestions
+                            </h4>
+                            <ul id="spamSuggestions"
+                                class="list-disc space-y-1 pl-5 text-sm text-slate-600">
+                                <li>Start typing to analyze your email.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!-- END AI SPAM FILTER -->
+
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Add Image</label>
+                        <label class="file-upload block" for="mailImage">
+                            <span class="material-symbols-outlined text-blue-500 mb-1">image</span>
+                            <p class="text-sm text-slate-600">Click to upload an image</p>
+                            <p id="mailImageName" class="text-xs text-slate-400 mt-1"></p>
+                            <input type="file" id="mailImage" accept="image/*" onchange="updateFileLabel('mailImage','mailImageName')" />
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Add PDF Attachment</label>
+                        <label class="file-upload block" for="mailPdf">
+                            <span class="material-symbols-outlined text-red-500 mb-1">picture_as_pdf</span>
+                            <p class="text-sm text-slate-600">Click to upload a PDF</p>
+                            <p id="mailPdfName" class="text-xs text-slate-400 mt-1"></p>
+                            <input type="file" id="mailPdf" accept="application/pdf" onchange="updateFileLabel('mailPdf','mailPdfName')" />
+                        </label>
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">
+                            Send To
+                        </label>
+
+                        <div class="flex flex-wrap gap-3">
+
+                            <label class="radio-pill">
+                                <input type="radio" name="targetGroup" value="all" checked>
+                                <span>All Users</span>
+                            </label>
+
+                            <label class="radio-pill">
+                                <input type="radio" name="targetGroup" value="male">
+                                <span>Male</span>
+                            </label>
+
+                            <label class="radio-pill">
+                                <input type="radio" name="targetGroup" value="female">
+                                <span>Female</span>
+                            </label>
+
+                            <label class="radio-pill">
+                                <input type="radio" name="targetGroup" value="country">
+                                <span>By Country</span>
+                            </label>
+
+                            <div id="countryTargetContainer" class="hidden mt-4">
+                                <label
+                                        for="mailTargetCountry"
+                                        class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Select Country
+                                </label>
+
+                                <select id="mailTargetCountry" class="field">
+                                    <option value="">Select a country</option>
+                                </select>
+
+                                <p class="text-xs text-slate-500 mt-2">
+                                    Emails will be sent only to subscribed users in the selected country.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Selected Users Section -->
+                    <div class="mt-6">
+
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">
+                            Or Select Specific Users
+                        </label>
+
+                        <button
+                                type="button"
+                                onclick="openUserSelectionModal()"
+                                class="btn-secondary flex items-center justify-center gap-2">
+
+                            <span class="material-symbols-outlined">groups</span>
+
+                            Select Users
+
+                        </button>
+
+                        <p id="selectedUserCount"
+                           class="mt-3 text-sm text-blue-600 font-semibold">
+
+                            No users selected
+
+                        </p>
+
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+
+                        <button
+                                onclick="sendNow()"
+                                class="btn-primary flex-1 flex items-center justify-center gap-2">
+
+        <span class="material-symbols-outlined"
+              style="font-size:20px">
+
+            send
+
+        </span>
+
+                            Send Now
+
+                        </button>
+
+                        <button
+                                onclick="openScheduleModal()"
+                                class="btn-secondary flex-1 flex items-center justify-center gap-2">
+
+        <span class="material-symbols-outlined"
+              style="font-size:20px">
+
+            schedule
+
+        </span>
+
+                            Schedule
+
+                        </button>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI -->
+            <section id="aiPage" class="hidden">
+                <div class="page-header">
+                    <h2>AI AGENT</h2>
+                    <p>Automate your entire workflow at just a click</p>
+                </div>
+                <div class="panel p-8 max-w-2xl space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Your Prompt</label>
+                        <textarea id="aiPrompt" class="field h-32 resize-y" placeholder="Describe the email you want to generate..."></textarea>
+                    </div>
+                    <button onclick="generateAI()" class="btn-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size:20px">auto_awesome</span>
+                        Generate
+                    </button>
+
+                    <div id="aiResponseWrapper" class="hidden">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Generated Content</label>
+                        <div id="aiResponse" class="ai-response-box">Generating...</div>
+                        <button onclick="copyToMailer()" class="btn-primary mt-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined" style="font-size:20px">content_copy</span>
+                            Copy to Mail Content
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EMAIL OPENS -->
+            <section id="emailOpensPage" class="hidden">
+                <div class="page-header">
+                    <h2>Email Open Analytics</h2>
+                    <p>Track when recipients open your emails</p>
+                </div>
+                <div class="panel overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Opened Time</th>
+                            </tr>
+                            </thead>
+                            <tbody id="emailOpenTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- SCHEDULE MODAL -->
+<div id="scheduleModal" class="modal-backdrop">
+    <div class="modal-box space-y-5">
+        <div class="text-center">
+            <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                <span class="material-symbols-outlined text-blue-600" style="font-size:28px">schedule_send</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Schedule Mail (IST)</h3>
+            <p class="text-sm text-slate-500 mt-1">Pick a date and time to send later</p>
+        </div>
+        <input type="date" id="scheduleDate" class="field" />
+        <input type="time" id="scheduleTime" class="field" />
+        <button onclick="confirmSchedule()" class="btn-primary w-full">Confirm Schedule</button>
+        <button onclick="closeScheduleModal()" class="w-full text-sm text-slate-500 hover:text-slate-700 py-2">Cancel</button>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal-backdrop">
+    <div class="modal-box text-center space-y-5">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-green-600" style="font-size:36px">check_circle</span>
+        </div>
+        <h3 class="text-xl font-bold text-green-600">Mail Sent Successfully</h3>
+        <p class="text-slate-600">Your mail has been delivered to selected users.</p>
+        <button onclick="closeSuccessModal()" class="btn-primary w-full">OK</button>
+    </div>
+</div>
+
+<script>
+    const SPAM_API = "http://127.0.0.1:8001";
+    const API = "http://172.20.10.2:8080";
+    // Update these two paths if your Spring Security controller uses different mappings.
+    const AUTH_LOGIN_URL = `${API}/api/auth/login`;
+    const AUTH_REGISTER_URL = `${API}/api/auth/register`;
+    const TOKEN_KEY = "mailPilotJwt";
+    const TOKEN_TYPE_KEY = "mailPilotTokenType";
+    const AUTH_EMAIL_KEY = "mailPilotEmail";
+    let authMode = "login";
+    let selectedUsers = [];
+    // const API = "";
+    let genderChart = null;
+    let mailChart = null;
+    let userDistributionChart = null;
+    let engagementChart = null;
+
+    const CHART_COLORS = {
+        primary: "#2563eb",
+        pink: "#ec4899",
+        green: "#16a34a",
+        slate: "#94a3b8",
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        populateCountries();
+
+        // Prevent selecting a date earlier than today.
+        const scheduleDateInput = document.getElementById("scheduleDate");
+
+        if (scheduleDateInput) {
+            const today = new Date();
+
+            scheduleDateInput.min =
+                today.getFullYear() + "-" +
+                String(today.getMonth() + 1).padStart(2, "0") + "-" +
+                String(today.getDate()).padStart(2, "0");
+        }
+
+        // Connect the spam checker to the subject and content fields.
+        const subjectInput = document.getElementById("mailSubject");
+        const contentInput = document.getElementById("mailContent");
+
+        if (subjectInput) {
+            subjectInput.addEventListener("input", analyzeSpam);
+        }
+
+        if (contentInput) {
+            contentInput.addEventListener("input", analyzeSpam);
+        }
+
+        // Preserve your existing authentication logic.
+        const token = localStorage.getItem(TOKEN_KEY);
+
+        if (token) {
+            showAuthenticatedApp();
+        } else {
+            showAuthPage();
+        }
+    });
+
+    function setAuthMode(mode) {
+        authMode = mode;
+        const registering = mode === "register";
+        document.getElementById("authNameWrap").classList.toggle("hidden", !registering);
+        document.getElementById("authName").required = registering;
+        document.getElementById("authPassword").autocomplete = registering ? "new-password" : "current-password";
+        document.getElementById("authSubmit").textContent = registering ? "Create account" : "Login";
+        document.getElementById("loginTab").className = registering ? "flex-1 rounded-lg py-3 font-semibold text-slate-500" : "flex-1 rounded-lg py-3 font-semibold bg-white shadow-sm text-blue-700";
+        document.getElementById("registerTab").className = registering ? "flex-1 rounded-lg py-3 font-semibold bg-white shadow-sm text-blue-700" : "flex-1 rounded-lg py-3 font-semibold text-slate-500";
+        document.getElementById("authError").classList.add("hidden");
+    }
+
+    function showAuthPage() {
+        document.getElementById("authPage").classList.remove("hidden");
+        document.getElementById("appShell").classList.add("hidden");
+    }
+
+    function showAuthenticatedApp() {
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) { showAuthPage(); return; }
+        document.getElementById("authPage").classList.add("hidden");
+        document.getElementById("appShell").classList.remove("hidden");
+        document.getElementById("signedInAs").textContent = localStorage.getItem(AUTH_EMAIL_KEY) || "Signed in";
+        loadDashboardStats();
+        loadCharts();
+    }
+
+
+    // Save the JWT returned by the backend. All authenticated API calls use this token.
+    function storeAuthToken(authResponse, email) {
+        const token = authResponse?.token || authResponse?.accessToken;
+        if (!token) return false;
+
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(TOKEN_TYPE_KEY, authResponse.tokenType || "Bearer");
+        if (email) localStorage.setItem(AUTH_EMAIL_KEY, email);
+        return true;
+    }
+
+    function clearAuthToken() {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(TOKEN_TYPE_KEY);
+        localStorage.removeItem(AUTH_EMAIL_KEY);
+    }
+
+    async function readResponseMessage(response) {
+        const body = await response.text();
+        if (!body) return `Request failed (${response.status})`;
+        try {
+            const parsed = JSON.parse(body);
+            return parsed.message || parsed.error || body;
+        } catch (_) {
+            return body;
+        }
+    }
+
+    async function submitAuth(event) {
+        event.preventDefault();
+        const errorBox = document.getElementById("authError");
+        const submitButton = document.getElementById("authSubmit");
+        errorBox.classList.add("hidden");
+
+        const email = document.getElementById("authEmail").value.trim().toLowerCase();
+        const password = document.getElementById("authPassword").value;
+        const payload = { email, password };
+        if (authMode === "register") {
+            payload.name = document.getElementById("authName").value.trim();
+        }
+
+        const registering = authMode === "register";
+        submitButton.disabled = true;
+        submitButton.textContent = registering ? "Creating account..." : "Signing in...";
+
+        try {
+            const response = await fetch(registering ? AUTH_REGISTER_URL : AUTH_LOGIN_URL, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(await readResponseMessage(response));
+            }
+
+            const rawBody = await response.text();
+            let authResponse = {};
+            if (rawBody) {
+                try { authResponse = JSON.parse(rawBody); }
+                catch (_) { throw new Error("The authentication API did not return valid JSON."); }
+            }
+
+            // Login must return a JWT. Registration may return only a success message;
+            // in that case, ask the user to log in rather than pretending a session exists.
+            if (!storeAuthToken(authResponse, email)) {
+                if (registering) {
+                    setAuthMode("login");
+                    document.getElementById("authPassword").value = "";
+                    errorBox.textContent = "Account registered successfully. Please log in; the registration endpoint did not return a JWT.";
+                    errorBox.classList.remove("hidden");
+                    return;
+                }
+                throw new Error("Login succeeded but the response did not contain 'token' or 'accessToken'. Make the login API return a JWT.");
+            }
+
+            showToast(registering ? "Account created successfully" : "Login successful");
+            showAuthenticatedApp();
+        } catch (error) {
+            console.error("Authentication request failed:", error);
+            const message = error instanceof TypeError
+                ? `Cannot reach the authentication API or the browser blocked it because of CORS. Frontend origin: ${window.location.origin}. Check the backend URL and Spring Security CORS configuration.`
+                : (error.message || "Unable to authenticate. Check your API endpoint and credentials.");
+            errorBox.textContent = message;
+            errorBox.classList.remove("hidden");
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = registering ? "Create account" : "Login";
+        }
+    }
+
+    let spamAnalysisTimeout = null;
+
+
+
+
+    async function analyzeSpam() {
+        const subjectElement = document.getElementById("mailSubject");
+        const contentElement = document.getElementById("mailContent");
+
+        const percentageElement = document.getElementById("spamPercentage");
+        const riskElement = document.getElementById("spamRisk");
+        const progressElement = document.getElementById("spamProgress");
+        const keywordsElement = document.getElementById("spamKeywords");
+        const suggestionsElement = document.getElementById("spamSuggestions");
+
+        if (!subjectElement || !contentElement) {
+            console.error("Spam checker: Subject or content field not found.");
+            return;
+        }
+
+        const subject = subjectElement.value.trim();
+        const content = contentElement.value.trim();
+
+        clearTimeout(spamAnalysisTimeout);
+
+        // Reset the UI when both fields are empty.
+        if (!subject && !content) {
+            if (percentageElement) {
+                percentageElement.textContent = "0.0%";
+                percentageElement.className =
+                    "font-bold text-lg text-green-600";
+            }
+
+            if (riskElement) {
+                riskElement.textContent = "Waiting for input";
+                riskElement.className = "font-semibold text-gray-500";
+            }
+
+            if (progressElement) {
+                progressElement.style.width = "0%";
+                progressElement.className =
+                    "h-full rounded-full transition-all duration-300 bg-green-500";
+            }
+
+            if (keywordsElement) {
+                keywordsElement.textContent = "No keywords detected yet.";
+            }
+
+            if (suggestionsElement) {
+                suggestionsElement.replaceChildren();
+
+                const item = document.createElement("li");
+                item.textContent = "Start typing to analyze your email.";
+                suggestionsElement.appendChild(item);
+            }
+
+            return;
+        }
+
+        // Debounce analysis to avoid sending a request on every keystroke.
+        spamAnalysisTimeout = setTimeout(async () => {
+            try {
+                if (percentageElement) {
+                    percentageElement.textContent = "Analyzing...";
+                }
+
+                if (riskElement) {
+                    riskElement.textContent = "Checking email...";
+                    riskElement.className = "font-semibold text-gray-500";
+                }
+
+                const response = await fetch(
+                    "http://127.0.0.1:8001/predict",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            subject: subject,
+                            content: content
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Spam API failed: ${response.status} ${response.statusText}`
+                    );
+                }
+
+                const result = await response.json();
+
+                // Normalize the spam score to the range 0–100.
+                const rawScore = Number(result.spamProbability);
+
+                if (!Number.isFinite(rawScore)) {
+                    throw new Error("Invalid spamProbability returned by API.");
+                }
+
+                const spamProbability = Math.max(
+                    0,
+                    Math.min(100, rawScore)
+                );
+
+                // Risk thresholds matching the Python backend.
+                let risk;
+                let textColor;
+                let barColor;
+
+                if (spamProbability >= 38) {
+                    risk = "High Risk";
+                    textColor = "text-red-600";
+                    barColor = "bg-red-500";
+                } else if (spamProbability >= 25) {
+                    risk = "Medium Risk";
+                    textColor = "text-yellow-600";
+                    barColor = "bg-yellow-500";
+                } else {
+                    risk = "Low Risk";
+                    textColor = "text-green-600";
+                    barColor = "bg-green-500";
+                }
+
+                // Update percentage and color.
+                if (percentageElement) {
+                    percentageElement.textContent =
+                        `${spamProbability.toFixed(1)}%`;
+
+                    percentageElement.className =
+                        `font-bold text-lg ${textColor}`;
+                }
+
+                // Update risk label and color.
+                if (riskElement) {
+                    riskElement.textContent = risk;
+                    riskElement.className =
+                        `font-semibold ${textColor}`;
+                }
+
+                // Update progress bar width and color.
+                if (progressElement) {
+                    progressElement.style.width =
+                        `${spamProbability}%`;
+
+                    progressElement.className =
+                        `h-full rounded-full transition-all duration-300 ${barColor}`;
+                }
+
+                // Render flagged indicators correctly.
+                // Supports both strings and objects from the Python API.
+                if (keywordsElement) {
+                    keywordsElement.replaceChildren();
+
+                    const keywords = Array.isArray(result.flaggedKeywords)
+                        ? result.flaggedKeywords
+                        : [];
+
+                    if (keywords.length === 0) {
+                        const message = document.createElement("span");
+                        message.className = "text-gray-500";
+                        message.textContent =
+                            "No suspicious indicators detected.";
+
+                        keywordsElement.appendChild(message);
+                    } else {
+                        keywords.forEach(keyword => {
+                            const badge = document.createElement("span");
+
+                            badge.className =
+                                "inline-block bg-red-100 text-red-700 " +
+                                "px-2 py-1 rounded-md text-xs mr-2 mb-2";
+
+                            if (typeof keyword === "string") {
+                                badge.textContent = keyword;
+                            } else if (
+                                keyword !== null &&
+                                typeof keyword === "object"
+                            ) {
+                                const category =
+                                    keyword.category ||
+                                    "Suspicious indicator";
+
+                                const terms = Array.isArray(keyword.terms)
+                                    ? keyword.terms.join(", ")
+                                    : "";
+
+                                badge.textContent = terms
+                                    ? `${category}: ${terms}`
+                                    : category;
+                            } else {
+                                badge.textContent = String(keyword);
+                            }
+
+                            keywordsElement.appendChild(badge);
+                        });
+                    }
+                }
+
+                // Render suggestions.
+                if (suggestionsElement) {
+                    suggestionsElement.replaceChildren();
+
+                    const suggestions = Array.isArray(result.suggestions)
+                        ? result.suggestions
+                        : [];
+
+                    if (suggestions.length === 0) {
+                        const item = document.createElement("li");
+                        item.textContent = "No suggestions available.";
+                        suggestionsElement.appendChild(item);
+                    } else {
+                        suggestions.forEach(suggestion => {
+                            const item = document.createElement("li");
+                            item.className = "mb-2";
+
+                            item.textContent =
+                                typeof suggestion === "string"
+                                    ? suggestion
+                                    : JSON.stringify(suggestion);
+
+                            suggestionsElement.appendChild(item);
+                        });
+                    }
+                }
+
+                console.log("Spam analysis result:", result);
+
+            } catch (error) {
+                console.error("Spam analysis error:", error);
+
+                if (percentageElement) {
+                    percentageElement.textContent = "--";
+                    percentageElement.className =
+                        "font-bold text-lg text-gray-500";
+                }
+
+                if (riskElement) {
+                    riskElement.textContent = "Service unavailable";
+                    riskElement.className =
+                        "font-semibold text-gray-500";
+                }
+
+                if (progressElement) {
+                    progressElement.style.width = "0%";
+                    progressElement.className =
+                        "h-full rounded-full transition-all duration-300 bg-gray-400";
+                }
+
+                if (keywordsElement) {
+                    keywordsElement.textContent =
+                        "Unable to retrieve flagged indicators.";
+                }
+
+                if (suggestionsElement) {
+                    suggestionsElement.replaceChildren();
+
+                    const item = document.createElement("li");
+                    item.textContent =
+                        "Check that the Python spam checker is running on port 8001.";
+
+                    suggestionsElement.appendChild(item);
+                }
+            }
+        }, 400);
+    }
+
+
+
+
+    function logout() {
+        clearAuthToken();
+        showAuthPage();
+        setAuthMode("login");
+        document.getElementById("authPassword").value = "";
+        showToast("You have signed out");
+    }
+
+    // ISO 3166-1 alpha-2 country codes rendered with the browser's localized country names.
+    function populateCountries() {
+        const select = document.getElementById("regCountry");
+        if (!select) return;
+        const codes = `AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW`.split(/\s+/);
+        const displayNames = new Intl.DisplayNames(["en"], { type: "region" });
+        select.innerHTML = '<option value="" selected disabled>Select country</option>';
+        codes.map(code => ({ code, name: displayNames.of(code) || code })).sort((a,b) => a.name.localeCompare(b.name)).forEach(country => {
+            const option = document.createElement("option"); option.value = country.name; option.textContent = country.name; select.appendChild(option);
+        });
+    }
+
+    function getAuthHeaders(extraHeaders = {}) {
+        const headers = new Headers(extraHeaders);
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (token) headers.set("Authorization", `${localStorage.getItem(TOKEN_TYPE_KEY) || "Bearer"} ${token}`);
+        return headers;
+    }
+
+    async function apiFetch(url, options = {}) {
+        const headers = getAuthHeaders(options.headers || {});
+        try {
+            return await fetch(url, {
+                ...options,
+                mode: "cors",
+                headers
+            });
+        } catch (error) {
+            console.error("API request failed (network/CORS):", {
+                url,
+                frontendOrigin: window.location.origin,
+                error: error?.message
+            });
+            throw new Error(
+                `Request blocked or backend unreachable: ${url}. ` +
+                `Frontend origin is ${window.location.origin}. ` +
+                `Check that the backend is running/reachable and Spring Security allows OPTIONS preflight requests and this origin via CORS.`
+            );
+        }
+    }
+
+    async function loadDashboardStats() {
+
+        try {
+
+            const [
+                users,
+                mailCountRes,
+                mailTodayRes,
+                aiCountRes,
+                avgTimeRes,
+                lastDurationRes,
+                // opens,
+                // openRateRes,
+                avgMailsPerUserRes,
+                maleUsersRes,
+                femaleUsersRes
+            ] = await Promise.all([
+
+                safeFetch(`${API}/api/user/get/all`).then(r=>r.json()),
+                safeFetch(`${API}/api/analytics/mails/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/mails/daily`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/ai/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/average-time`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/last-duration`).then(r=>r.text()),
+                // safeFetch(`${API}/api/analytics/email-opens`).then(r=>r.json()),
+                // safeFetch(`${API}/api/analytics/open-rate`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/avg-mails-per-user`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/users/male/count`).then(r=>r.text()),
+                safeFetch(`${API}/api/analytics/users/female/count`).then(r=>r.text())
+
+            ]);
+
+            userCount.innerText = users.length;
+            mailCount.innerText = mailCountRes;
+            mailToday.innerText = mailTodayRes;
+            aiCount.innerText = aiCountRes;
+            avgTime.innerText = avgTimeRes + " ms";
+            lastDuration.innerText = lastDurationRes + " ms";
+            // openCount.innerText = opens.length;
+            maleUsers.innerText = maleUsersRes;
+            femaleUsers.innerText = femaleUsersRes;
+            // openRate.innerText = Number(openRateRes).toFixed(1) + "%";
+            avgMailsPerUser.innerText =
+                Number(avgMailsPerUserRes).toFixed(1);
+
+            // engagementScore.innerText =
+            //     Number(openRateRes).toFixed(1) + "%";
+
+        }
+        catch(e){
+
+            console.error(e);
+
+        }
+
+    }
+
+    async function loadCharts(){
+
+        try{
+
+            const genderStats =
+                await safeFetch(
+                    `${API}/api/analytics/users/gender`
+                ).then(r=>r.json());
+
+            drawCharts(genderStats);
+
+        }
+        catch(e){
+
+            console.error(e);
+
+        }
+    }
+
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebarOverlay").classList.toggle("open");
+    }
+
+    function updateFileLabel(inputId, labelId) {
+        const file = document.getElementById(inputId).files[0];
+        document.getElementById(labelId).textContent = file ? file.name : "";
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        toast.style.display = "block";
+        toast.style.background = type === "error"
+            ? "linear-gradient(135deg, #dc2626, #b91c1c)"
+            : "linear-gradient(135deg, #16a34a, #15803d)";
+        toast.innerText = message;
+        setTimeout(() => (toast.style.display = "none"), 2500);
+    }
+
+    function showPage(page) {
+        ["dashboard", "register", "mailer", "ai", "userList", "emailOpens"].forEach((p) => {
+            const el = document.getElementById(p + "Page");
+            if (el) el.classList.add("hidden");
+        });
+        document.getElementById(page + "Page").classList.remove("hidden");
+
+        document.querySelectorAll(".nav-item").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.page === page);
+        });
+
+        if (window.innerWidth <= 768) {
+            document.getElementById("sidebar").classList.remove("open");
+            document.getElementById("sidebarOverlay").classList.remove("open");
+        }
+        if(page==="dashboard"){
+
+            loadDashboardStats();
+
+            loadCharts();
+
+        }
+
+        if(page==="userList"){
+
+            loadUsers();
+
+        }
+
+        if(page==="emailOpens"){
+
+            loadEmailOpens();
+
+        }
+    }
+
+    async function loadMailTargetCountries() {
+        const select = document.getElementById("mailTargetCountry");
+
+        try {
+            const users = await safeFetch(
+                `${API}/api/user/get/all`
+            ).then(response => response.json());
+
+            const countries = [
+                ...new Set(
+                    users
+                        .map(user => user.country?.trim())
+                        .filter(Boolean)
+                )
+            ].sort((a, b) => a.localeCompare(b));
+
+            select.innerHTML =
+                '<option value="">Select a country</option>';
+
+            countries.forEach(country => {
+                const option = document.createElement("option");
+                option.value = country;
+                option.textContent = country;
+                select.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Failed to load countries:", error);
+            showToast("Failed to load countries", "error");
+        }
+    }
+
+
+    document.querySelectorAll('input[name="targetGroup"]')
+        .forEach(radio => {
+            radio.addEventListener("change", () => {
+                const isCountry =
+                    document.querySelector(
+                        'input[name="targetGroup"]:checked'
+                    )?.value === "country";
+
+                document.getElementById("countryTargetContainer")
+                    .classList.toggle("hidden", !isCountry);
+
+                if (isCountry) {
+                    loadMailTargetCountries();
+                }
+            });
+        });
+
+    async function loadUsers() {
+        try {
+            const users = await safeFetch(`${API}/api/user/get/all`).then((r) => r.json());
+            const tbody = document.getElementById("userTableBody");
+            tbody.innerHTML = "";
+
+            if (!users.length) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400">No users registered yet</td></tr>`;
+                return;
+            }
+
+            users.forEach((user) => {
+                const genderBadge = user.gender
+                    ? `<span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.gender === "male" ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}">${user.gender}</span>`
+                    : `<span class="text-slate-400">—</span>`;
+
+                const isSubscribed = Boolean(user.subscribed ?? user.isSubscribed ?? user.subStatus ?? false);
+                tbody.innerHTML += `
+    <tr>
+        <td class="font-mono text-slate-500">#${user.id}</td>
+        <td class="font-semibold">${escapeHtml(user.name)}</td>
+        <td>${escapeHtml(user.email)}</td>
+        <td>${genderBadge}</td>
+        <td>${user.dob || "—"}</td>
+        <td>${user.age ?? "—"}</td>
+        <td>${escapeHtml(user.country || "—")}</td>
+        <td><span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${isSubscribed ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}">${isSubscribed ? "Subscribed" : "Not subscribed"}</span></td>
+        <td class="space-x-2 whitespace-nowrap">
+   <button
+    onclick="toggleSubscription(${user.id}, this)">
+    ${isSubscribed ? "Unsubscribe" : "Subscribe"}
+</button>
+</button>            <button
+                onclick="editUser(
+                    ${user.id},
+                    '${escapeAttr(user.name)}',
+                    '${escapeAttr(user.email)}',
+                    '${escapeAttr(user.gender || "")}'
+                )"
+                class="btn-secondary btn-sm">
+                Update
+            </button>
+
+            <button
+                onclick="deleteUser(${user.id})"
+                class="btn-danger btn-sm">
+                Delete
+            </button>
+        </td>
+    </tr>`;
+            });
+        } catch (e) {
+            showToast("Failed to load users", "error");
+        }
+    }
+
+    function escapeHtml(str) {
+        const d = document.createElement("div");
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    function escapeAttr(str) {
+        return String(str).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    }
+
+
+async function toggleSubscription(userId, button) {
+    if (!button || button.disabled) return;
+
+    const row = button.closest("tr");
+    const badge = row?.querySelector(".subscription-badge");
+
+    // Determine current state from the button.
+    const isSubscribed =
+        button.textContent.trim().toLowerCase() === "unsubscribe";
+
+    const endpoint = isSubscribed
+        ? `${API}/api/user/update/subs/disable?id=${encodeURIComponent(userId)}`
+        : `${API}/api/user/update/subs?id=${encodeURIComponent(userId)}`;
+
+    const originalButtonText = button.textContent.trim();
+
+    button.disabled = true;
+    button.textContent = "Updating...";
+
+    try {
+        const response = await apiFetch(endpoint, {
+            method: "PATCH"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request failed (${response.status})`);
+        }
+
+        const message = await response.text();
+
+        // Calculate the new status.
+        const newIsSubscribed = !isSubscribed;
+
+        // Update the Actions button.
+        button.textContent = newIsSubscribed
+            ? "Unsubscribe"
+            : "Subscribe";
+
+        // Update the Subscription badge.
+        if (badge) {
+            badge.textContent = newIsSubscribed
+                ? "Subscribed"
+                : "Unsubscribed";
+
+            badge.classList.toggle("subscribed", newIsSubscribed);
+            badge.classList.toggle("unsubscribed", !newIsSubscribed);
+        }
+
+        alert(
+            message ||
+            (newIsSubscribed
+                ? "User subscribed successfully!"
+                : "User unsubscribed successfully!")
+        );
+
+    } catch (error) {
+        console.error("Subscription update failed:", error);
+
+        button.textContent = originalButtonText;
+
+        alert("Failed to update subscription. Please try again.");
+
+    } finally {
+        button.disabled = false;
+    }
+}
+
+
+    async function editUser(id, name, email, gender) {
+        const newName = prompt("Enter new name:", name);
+        if (!newName) return;
+
+        const newEmail = prompt("Enter new email:", email);
+        if (!newEmail) return;
+
+        const newGender = prompt("Enter gender (male/female):", gender);
+
+        try {
+            await safeFetch(`${API}/api/user/update/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newName, email: newEmail, gender: newGender }),
+            });
+
+            showToast("User Updated Successfully ✅");
+            loadUsers();
+            loadUsers();
+
+            loadDashboardStats();
+
+            loadCharts();
+        } catch (e) {
+            showToast(e.message, "error");
+        }
+    }
+
+    async function deleteUser(id) {
+        if (!confirm("Are you sure you want to delete this user?")) return;
+
+        try {
+            await safeFetch(`${API}/api/user/delete/${id}`, { method: "DELETE" });
+            showToast("User Deleted Successfully ✅");
+            loadUsers();
+            loadUsers();
+
+            loadDashboardStats();
+
+            loadCharts();
+        } catch (e) {
+            showToast(e.message, "error");
+        }
+    }
+
+    async function safeFetch(url, options = {}) {
+        const res = await apiFetch(url, options);
+        if (res.status === 401) {
+            logout();
+            throw new Error("Your session has expired. Please log in again.");
+        }
+        if (!res.ok) {
+            const err = await res.text();
+            throw new Error(err || `Request failed (${res.status})`);
+        }
+        return res;
+    }
+
+    function confirmSelectedUsers() {
+
+        selectedUsers = [];
+
+        document.querySelectorAll(".user-checkbox:checked").forEach(cb => {
+
+            selectedUsers.push({
+                id: Number(cb.dataset.id),
+                name: cb.dataset.name,
+                email: cb.dataset.email
+            });
+
+        });
+
+        document.getElementById("selectedUserCount").innerText =
+            selectedUsers.length === 0
+                ? "No users selected"
+                : `${selectedUsers.length} user(s) selected`;
+
+        closeUserSelectionModal();
+
+        showToast(`${selectedUsers.length} user(s) selected`);
+    }
+
+    function openScheduleModal() {
+        document.getElementById("scheduleModal").classList.add("open");
+    }
+
+    function closeScheduleModal() {
+        document.getElementById("scheduleModal").classList.remove("open");
+    }
+
+    function openSuccessModal() {
+        document.getElementById("successModal").classList.add("open");
+    }
+
+    function closeSuccessModal() {
+        document.getElementById("successModal").classList.remove("open");
+    }
+
+    function showScheduledWidget(subject, time) {
+        document.getElementById("scheduledSubject").innerText = subject;
+        document.getElementById("scheduledTime").innerText = time;
+        document.getElementById("scheduledMailWidget").classList.remove("hidden");
+    }
+
+    function hideScheduledWidget() {
+        document.getElementById("scheduledMailWidget").classList.add("hidden");
+    }
+
+
+    async function confirmSchedule() {
+        const date = document.getElementById("scheduleDate").value;
+        const time = document.getElementById("scheduleTime").value;
+
+        const subject = document.getElementById("mailSubject").value.trim();
+        const content = document.getElementById("mailContent").value.trim();
+
+        const image = document.getElementById("mailImage").files[0];
+        const pdf = document.getElementById("mailPdf").files[0];
+
+        const target = document.querySelector(
+            'input[name="targetGroup"]:checked'
+        );
+
+        // Validate date and time.
+        if (!date || !time) {
+            showToast("Please select a schedule date and time.", "error");
+            return;
+        }
+
+        // Validate email content.
+        if (!subject) {
+            showToast("Subject cannot be empty.", "error");
+            return;
+        }
+
+        if (!content) {
+            showToast("Message cannot be empty.", "error");
+            return;
+        }
+
+        // Interpret the selected date/time in the browser's local timezone.
+        const scheduledDate = new Date(`${date}T${time}:00`);
+
+        if (Number.isNaN(scheduledDate.getTime())) {
+            showToast("Invalid schedule date or time.", "error");
+            return;
+        }
+
+        // Reject past times and the current instant.
+        if (scheduledDate.getTime() <= Date.now()) {
+            showToast(
+                "Schedule time must be in the future. Please select a later time.",
+                "error"
+            );
+            return;
+        }
+
+        let url = `${API}/api/mail/dispatch`;
+
+        if (
+            selectedUsers.length === 0 &&
+            target &&
+            ["male", "female"].includes(target.value)
+        ) {
+            url += `?gender=${encodeURIComponent(target.value)}`;
+        }
+
+        // Prepare the request without altering the selected time.
+        const pad = n => String(n).padStart(2, "0");
+
+        const formatted =
+            `${scheduledDate.getFullYear()}-` +
+            `${pad(scheduledDate.getMonth() + 1)}-` +
+            `${pad(scheduledDate.getDate())}T` +
+            `${pad(scheduledDate.getHours())}:` +
+            `${pad(scheduledDate.getMinutes())}:00`;
+
+        const formData = new FormData();
+
+        formData.append("subject", subject);
+        formData.append("content", content);
+        formData.append("sendAt", formatted);
+
+        if (selectedUsers.length > 0) {
+            selectedUsers.forEach(user => {
+                formData.append("recipientIds", user.id);
+            });
+        }
+
+        if (image) {
+            formData.append("image", image);
+        }
+
+        if (pdf) {
+            formData.append("pdf", pdf);
+        }
+
+        // Do not show a scheduled widget or close the modal yet.
+        showToast("Scheduling email...");
+
+        try {
+            const response = await apiFetch(url, {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    await response.text() ||
+                    `Request failed (${response.status})`
+                );
+            }
+
+            // Only show success after the backend accepts the request.
+            const readableTime = scheduledDate.toLocaleString("en-IN", {
+                dateStyle: "medium",
+                timeStyle: "short"
+            });
+
+            closeScheduleModal();
+
+            showScheduledWidget(
+                subject,
+                "Scheduled for " + readableTime
+            );
+
+            showToast("Email scheduled successfully!");
+
+            clearMailForm();
+
+            selectedUsers = [];
+
+            const selectedCount =
+                document.getElementById("selectedUserCount");
+
+            if (selectedCount) {
+                selectedCount.innerText = "No users selected";
+            }
+
+            // Use the analytics functions that actually exist.
+            setTimeout(() => {
+                loadDashboardStats();
+                loadCharts();
+            }, 500);
+
+        } catch (error) {
+            console.error("Schedule mail failed:", error);
+
+            // Keep the modal open and do not show a scheduled widget.
+            showToast(
+                error.message || "Failed to schedule email.",
+                "error"
+            );
+        }
+    }
+
+
+    function showScheduleBanner(readableTime) {
+        const existing = document.getElementById("scheduleBanner");
+        if (existing) existing.remove();
+
+        const banner = document.createElement("div");
+        banner.id = "scheduleBanner";
+        banner.innerHTML = `
+      <span style="font-size:16px;">📅</span>
+      <span>Mail scheduled for <strong>${readableTime}</strong></span>
+      <button onclick="document.getElementById('scheduleBanner').remove()"
+        style="margin-left:16px;background:rgba(255,255,255,0.25);border:none;color:white;
+               border-radius:6px;padding:2px 10px;cursor:pointer;font-size:13px;">✕</button>`;
+        Object.assign(banner.style, {
+            position: "fixed", top: "16px", right: "20px",
+            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+            color: "white", padding: "12px 20px", borderRadius: "14px",
+            fontWeight: "600", fontSize: "14px", display: "flex",
+            alignItems: "center", gap: "10px", zIndex: "9999",
+            boxShadow: "0 8px 24px rgba(37, 99, 235, 0.35)",
+        });
+        document.body.appendChild(banner);
+        setTimeout(() => {
+            if (document.getElementById("scheduleBanner")) banner.remove();
+        }, 6000);
+    }
+
+    function clearMailForm() {
+        document.getElementById("mailSubject").value = "";
+        document.getElementById("mailContent").value = "";
+        document.getElementById("mailImage").value = "";
+        document.getElementById("mailPdf").value = "";
+        document.getElementById("mailImageName").textContent = "";
+        document.getElementById("mailPdfName").textContent = "";
+    }
+
+    async function sendNow() {
+        const subject = document.getElementById("mailSubject").value.trim();
+        const content = document.getElementById("mailContent").value.trim();
+        const image = document.getElementById("mailImage").files[0];
+        const pdf = document.getElementById("mailPdf").files[0];
+
+        if (!subject) {
+            showToast("Subject cannot be empty", "error");
+            return;
+        }
+
+        if (!content) {
+            showToast("Message cannot be empty", "error");
+            return;
+        }
+
+        const target = document.querySelector(
+            'input[name="targetGroup"]:checked'
+        );
+
+        // COUNTRY CAMPAIGN: use MailSenderClass through the new backend API.
+        if (target?.value === "country") {
+            const country =
+                document.getElementById("mailTargetCountry").value;
+
+            if (!country) {
+                showToast("Please select a country", "error");
+                return;
+            }
+
+            // The current country endpoint accepts country, subject and body.
+            // It does not accept image or PDF attachments.
+            if (image || pdf) {
+                showToast(
+                    "Image and PDF attachments are not supported for country campaigns yet.",
+                    "error"
+                );
+                return;
+            }
+
+            if (!confirm(
+                `Send this email to subscribed users in ${country}?`
+            )) {
+                return;
+            }
+
+            try {
+                const response = await apiFetch(
+                    `${API}/api/email/send/by-country`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            country: country,
+                            subject: subject,
+                            body: content
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        await response.text() ||
+                        `Request failed (${response.status})`
+                    );
+                }
+
+                const result = await response.json();
+
+                showToast(
+                    `Country campaign queued: ${result.emailsQueued} emails`
+                );
+
+                clearMailForm();
+
+                document.getElementById("mailTargetCountry").value = "";
+
+                loadDashboardStats();
+                loadCharts();
+
+            } catch (error) {
+                console.error("Country email campaign failed:", error);
+                showToast(error.message || "Failed to send country campaign", "error");
+            }
+
+            return;
+        }
+
+        // EXISTING EMAIL SENDING BEHAVIOR
+        let url = `${API}/api/mail/dispatch`;
+
+        const formData = new FormData();
+        formData.append("subject", subject);
+        formData.append("content", content);
+
+        if (selectedUsers.length > 0) {
+            selectedUsers.forEach(user => {
+                formData.append("recipientIds", user.id);
+            });
+        } else if (target && target.value !== "all") {
+            url += `?gender=${encodeURIComponent(target.value)}`;
+        }
+
+        if (image) formData.append("image", image);
+        if (pdf) formData.append("pdf", pdf);
+
+        try {
+            const response = await apiFetch(url, {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    await response.text() ||
+                    `Request failed (${response.status})`
+                );
+            }
+
+            showToast("Mail request submitted successfully");
+
+            clearMailForm();
+
+            selectedUsers = [];
+
+            document.getElementById("selectedUserCount").innerText =
+                "No users selected";
+
+            setTimeout(() => {
+                loadDashboardStats();
+                loadCharts();
+            }, 500);
+
+        } catch (error) {
+            console.error(error);
+            showToast(error.message || "Failed to send mail", "error");
+        }
+    }
+
+    async function subscribeUser(userId, button) {
+        if (button.disabled) return;
+
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = "Subscribing...";
+
+        try {
+            // Replace this URL with your actual backend subscribe endpoint.
+            const response = await apiFetch(
+                `${API}/api/user/subscribe/${userId}`,
+                {
+                    method: "POST"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Request failed (${response.status})`);
+            }
+
+            // Update the button immediately after a successful response.
+            button.textContent = "Subscribed";
+            button.disabled = true;
+
+            alert("User subscribed back successfully!");
+
+            // Optionally refresh the list if your existing function supports it.
+            // await loadUsers();
+
+        } catch (error) {
+            console.error("Subscribe failed:", error);
+
+            button.disabled = false;
+            button.textContent = originalText;
+
+            alert("Failed to subscribe user. Please try again.");
+        }
+    }
+
+    function renderSubscriptionButton(user) { const isSubscribed = user.isSubscribed ?? user.is_subscribed; return ` <button class="subscribe-btn" onclick='toggleSubscription( ${JSON.stringify(user).replace(/'/g, "&#39;")}, this )'> ${isSubscribed ? "Unsubscribe" : "Subscribe"} </button> `; }
+
+
+    async function createUser() {
+
+        const name = document.getElementById("regName").value.trim();
+        const email = document.getElementById("regEmail").value.trim();
+        const gender = document.getElementById("regGender").value.trim();
+        const dob = document.getElementById("regDob").value;
+        const age = Number(document.getElementById("regAge").value);
+        const country = document.getElementById("regCountry").value;
+
+        // Validate fields
+        if (!name || !email || !gender || !dob || !age || !country) {
+            showToast("All fields are required.", "error");
+            return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            showToast("Please enter a valid email address.", "error");
+            return;
+        }
+
+        try {
+
+            await safeFetch(`${API}/api/user/create/user`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    gender: gender,
+                    dob: dob,
+                    age: age,
+                    country: country
+                })
+            });
+
+            showToast("User Created Successfully ✅");
+
+            // Clear fields
+            regName.value = "";
+            regEmail.value = "";
+            regGender.value = "";
+            regDob.value = "";
+            document.getElementById("regAge").value = "";
+            document.getElementById("regCountry").value = "";
+
+            loadUsers();
+            loadDashboardStats();
+            loadCharts();
+
+        } catch (e) {
+            console.error("Create user failed:", e);
+            showToast(e.message || "Failed to create user", "error");
+        }
+    }
+
+    async function generateAI() {
+
+        if (!aiPrompt.value) {
+            showToast("Enter prompt", "error");
+            return;
+        }
+
+        aiResponseWrapper.classList.remove("hidden");
+        aiResponse.innerText = "";
+
+        try {
+
+            const response = await apiFetch(
+                `${API}/api/ai/get?prompt=${encodeURIComponent(aiPrompt.value)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+
+                const { value, done } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                const chunk = decoder.decode(value, {
+                    stream: true
+                });
+
+                aiResponse.innerText += chunk;
+            }
+
+            showToast("AI Generated");
+            loadDashboardStats();
+
+        } catch (e) {
+
+            console.error(e);
+            showToast(e.message, "error");
+
+        }
+    }
+
+    function copyToMailer() {
+        mailContent.value = aiResponse.innerText;
+        showToast("Copied to Mail Content");
+    }
+
+    const chartDefaults = {
+        responsive: true,
+        plugins: { legend: { labels: { font: { family: "Plus Jakarta Sans", size: 12 }, padding: 16 } } },
+    };
+
+    async function drawCharts() {
+
+        try {
+
+            const [
+                genderStats,
+                opens,
+                mailCountRes,
+                maleUsersRes,
+                femaleUsersRes
+            ] = await Promise.all([
+
+                safeFetch(`${API}/api/analytics/users/gender`).then(r => r.json()),
+                safeFetch(`${API}/api/analytics/email-opens`).then(r => r.json()),
+                safeFetch(`${API}/api/analytics/mails/count`).then(r => r.text()),
+                safeFetch(`${API}/api/analytics/users/male/count`).then(r => r.text()),
+                safeFetch(`${API}/api/analytics/users/female/count`).then(r => r.text())
+
+            ]);
+
+            if (genderChart) genderChart.destroy();
+            genderChart = new Chart(document.getElementById("genderChart"), {
+                type: "bar",
+                data: {
+                    labels: ["Male", "Female"],
+                    datasets: [{
+                        label: "Users",
+                        data: [genderStats.male || 0, genderStats.female || 0],
+                        backgroundColor: [CHART_COLORS.primary, CHART_COLORS.pink]
+                    }]
+                },
+                options: chartDefaults
+            });
+
+            if (userDistributionChart) userDistributionChart.destroy();
+            userDistributionChart = new Chart(document.getElementById("userDistributionChart"), {
+                type: "doughnut",
+                data: {
+                    labels: ["Male", "Female"],
+                    datasets: [{
+                        data: [
+                            Number(maleUsersRes),
+                            Number(femaleUsersRes)
+                        ],
+                        backgroundColor: [
+                            CHART_COLORS.primary,
+                            CHART_COLORS.pink
+                        ]
+                    }]
+                },
+                options: chartDefaults
+            });
+
+            if (mailChart) mailChart.destroy();
+            mailChart = new Chart(document.getElementById("mailChart"), {
+                type: "line",
+                data: {
+                    labels: ["Yesterday", "Today"],
+                    datasets: [{
+                        label: "Mails",
+                        data: [0, Number(mailCountRes)],
+                        borderColor: "#2563eb",
+                        backgroundColor: "rgba(37, 99, 235, 0.12)",
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: "#2563eb",
+                        tension: 0.3,
+                        fill: false
+                    }]
+                },
+                options: chartDefaults
+            });
+
+            if (engagementChart) engagementChart.destroy();
+            engagementChart = new Chart(document.getElementById("engagementChart"), {
+                type: "pie",
+                data: {
+                    labels: ["Opened", "Not Opened"],
+                    datasets: [{
+                        data: [
+                            opens.length,
+                            Math.max(0, Number(mailCountRes) - opens.length)
+                        ],
+                        backgroundColor: [
+                            CHART_COLORS.green,
+                            CHART_COLORS.slate
+                        ]
+                    }]
+                },
+                options: chartDefaults
+            });
+
+        } catch (e) {
+
+            console.error(e);
+
+        }
+    }
+
+    function renderUserSelection(users) {
+
+        const div = document.getElementById("userListContainer");
+
+        div.innerHTML = "";
+
+        users.forEach(user => {
+
+            const isSelected = selectedUsers.some(
+                selected => selected.id === user.id
+            );
+
+            div.innerHTML += `
+<label
+style="
+display:flex;
+padding:10px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+align-items:center;
+">
+
+<input
+class="user-checkbox"
+type="checkbox"
+data-id="${user.id}"
+data-name="${user.name}"
+data-email="${user.email}"
+${isSelected ? "checked" : ""}
+style="margin-right:12px;">
+
+<div>
+
+<b>${user.name}</b><br>
+
+<small>${user.email}</small>
+
+</div>
+
+</label>
+`;
+
+        });
+
+    }
+    function filterUsers(){
+
+        const keyword =
+            document
+                .getElementById("userSearch")
+                .value
+                .toLowerCase();
+
+        const filtered =
+            allUsers.filter(u=>
+
+                u.name.toLowerCase().includes(keyword)
+
+                ||
+
+                u.email.toLowerCase().includes(keyword)
+
+            );
+
+        renderUserSelection(filtered);
+
+    }
+
+    let allUsers = [];
+
+    async function openUserSelectionModal() {
+
+        document
+            .getElementById("userSelectionModal")
+            .classList
+            .add("open");
+
+        if (allUsers.length === 0) {
+
+            allUsers = await safeFetch(
+                `${API}/api/user/get/all`
+            ).then(r => r.json());
+
+        }
+
+        renderUserSelection(allUsers);
+    }
+
+    function closeUserSelectionModal() {
+
+        document
+            .getElementById("userSelectionModal")
+            .classList
+            .remove("open");
+    }
+
+    async function loadEmailOpens() {
+        try {
+            const data = await safeFetch(`${API}/api/analytics/email-opens`).then((r) => r.json());
+            const tbody = document.getElementById("emailOpenTableBody");
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-8 text-center text-slate-400">No email opens yet</td></tr>`;
+                return;
+            }
+
+            data.forEach((item) => {
+                tbody.innerHTML += `
+          <tr>
+            <td class="font-medium">${escapeHtml(item.email)}</td>
+            <td class="text-slate-500">${new Date(item.openedAt).toLocaleString()}</td>
+          </tr>`;
+            });
+        } catch (e) {
+            showToast("Failed to load email opens", "error");
+        }
+    }
+</script>
+
+<div id="userSelectionModal"
+     class="modal-backdrop">
+
+    <div class="modal-box"
+         style="max-width:700px">
+
+        <h2 class="text-xl font-bold mb-4">
+            Select Users
+        </h2>
+
+        <input
+                id="userSearch"
+                class="field mb-4"
+                placeholder="Search user..."
+                onkeyup="filterUsers()">
+
+        <div
+                id="userListContainer"
+                style="max-height:350px;
+                       overflow:auto">
+
+        </div>
+
+        <div class="flex gap-3 mt-5">
+
+            <button
+                    class="btn-primary"
+                    onclick="confirmSelectedUsers()">
+
+                Confirm
+
+            </button>
+
+            <button
+                    class="btn-secondary"
+                    onclick="closeUserSelectionModal()">
+
+                Cancel
+
+            </button>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

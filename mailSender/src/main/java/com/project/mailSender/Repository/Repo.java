@@ -12,4 +12,6 @@ public interface Repo extends JpaRepository<Users,Long> {
     List<Users> findByGender(String gender);
 
     Users findByEmail(String email);
+
+    List<Users> findByCountry(String country);
 }

@@ -1,5 +1,6 @@
 package com.project.mailSender.AiStuff;
 
+import com.project.mailSender.MailService.MailSenderClass;
 import com.project.mailSender.MailService.MailService;
 import com.project.mailSender.Model.MailLog;
 import com.project.mailSender.Model.Users;
@@ -32,7 +33,7 @@ public class EmailTool {
     private MailLogRepo mailLogRepo;
 
     @Autowired
-    private MailService mailService;
+    private MailSenderClass mailService;
 
 //    @Async("mailExecutor")
     @Tool(

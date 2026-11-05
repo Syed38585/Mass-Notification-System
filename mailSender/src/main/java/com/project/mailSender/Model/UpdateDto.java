@@ -7,4 +7,5 @@ public class UpdateDto {
     String email;
     String name;
     String gender;
+    Integer age;
 }
