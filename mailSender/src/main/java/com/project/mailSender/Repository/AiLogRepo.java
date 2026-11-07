@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface AiLogRepo extends JpaRepository<AiLog, Long> {
     List<AiLog> findByRequestedAtAfter(LocalDateTime time);
+
+
+
+    long countByRequestedAtAfter(LocalDateTime time);
 }

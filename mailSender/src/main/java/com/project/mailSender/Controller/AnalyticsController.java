@@ -1,41 +1,70 @@
 package com.project.mailSender.Controller;
 
+import com.project.mailSender.Repository.AiLogRepo;
+import com.project.mailSender.Repository.MailLogRepo;
+import com.project.mailSender.Repository.Repo;
 
-import com.project.mailSender.Repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.ZoneId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics")
 @CrossOrigin(origins = "*")
 public class AnalyticsController {
 
-    @Autowired
-    Repo userRepo;
+    private final Repo userRepo;
+    private final MailLogRepo mailLogRepo;
+    private final AiLogRepo aiLogRepo;
 
-    @Autowired
-    MailLogRepo mailLogRepo;
+    private static final ZoneId IST_ZONE =
+            ZoneId.of("Asia/Kolkata");
 
-    @Autowired
-    AiLogRepo aiLogRepo;
+    public AnalyticsController(
+            Repo userRepo,
+            MailLogRepo mailLogRepo,
+            AiLogRepo aiLogRepo) {
 
-    @Autowired
-    EmailOpenLogRepo emailOpenLogRepo;
+        this.userRepo = userRepo;
+        this.mailLogRepo = mailLogRepo;
+        this.aiLogRepo = aiLogRepo;
+    }
+
+    // =====================================================
+    // TODAY'S START TIME
+    // =====================================================
+
+    private LocalDateTime startOfToday() {
+
+        return LocalDate.now(IST_ZONE).atStartOfDay();
+    }
+
+    // =====================================================
+    // USER STATISTICS
+    // =====================================================
+
+    private long maleUserCount() {
+        return userRepo.findByGender("male").size();
+    }
+
+    private long femaleUserCount() {
+        return userRepo.findByGender("female").size();
+    }
 
     @GetMapping("/users/gender")
     public Map<String, Long> genderStats() {
 
-        long male = userRepo.findByGender("male").size();
-        long female = userRepo.findByGender("female").size();
+        Map<String, Long> result = new HashMap<>();
 
-        Map<String, Long> map = new HashMap<>();
-        map.put("male", male);
-        map.put("female", female);
+        result.put("male", maleUserCount());
+        result.put("female", femaleUserCount());
 
-        return map;
+        return result;
     }
 
     @GetMapping("/users/count")
@@ -45,89 +74,44 @@ public class AnalyticsController {
 
     @GetMapping("/users/male/count")
     public long maleUsers() {
-        return userRepo.findByGender("male").size();
+        return maleUserCount();
     }
 
     @GetMapping("/users/female/count")
     public long femaleUsers() {
-        return userRepo.findByGender("female").size();
+        return femaleUserCount();
     }
+
+    // =====================================================
+    // MAIL STATISTICS
+    // =====================================================
 
     @GetMapping("/mails/count")
     public long totalMails() {
+
         return mailLogRepo.count();
-    }
-
-    @GetMapping("/ai/count")
-    public long totalAi() {
-        LocalDateTime startOfDay =
-                LocalDateTime.now()
-                        .toLocalDate()
-                        .atStartOfDay();
-
-        return aiLogRepo
-                .findByRequestedAtAfter(startOfDay)
-                .size();
     }
 
     @GetMapping("/mails/daily")
     public long mailsToday() {
-        LocalDateTime startOfDay =
-                LocalDateTime.now()
-                        .toLocalDate()
-                        .atStartOfDay();
 
         return mailLogRepo
-                .findBySentAtAfter(startOfDay)
+                .findBySentAtAfter(startOfToday())
                 .size();
     }
 
-
     @GetMapping("/average-time")
     public long getAverageSendTime() {
+
         return mailLogRepo.findAverageDuration();
     }
 
     @GetMapping("/last-duration")
     public long getLastDuration() {
+
         return mailLogRepo.findTopByOrderBySentAtDesc()
                 .map(log -> log.getDurationMs())
                 .orElse(0L);
-    }
-
-    @GetMapping("/email-opens")
-    public List<Map<String, Object>> getEmailOpens() {
-
-        List<Map<String, Object>> response = new ArrayList<>();
-
-        emailOpenLogRepo.findAllByOrderByOpenedAtDesc()
-                .forEach(log -> {
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("email", log.getEmail());
-                    map.put("openedAt", log.getOpenedAt());
-
-                    response.add(map);
-                });
-
-        return response;
-    }
-
-    @GetMapping("/email-opens/count")
-    public long totalOpens() {
-        return emailOpenLogRepo.count();
-    }
-
-    @GetMapping("/open-rate")
-    public double openRate() {
-
-        long mails = mailLogRepo.count();
-
-        if (mails == 0) {
-            return 0;
-        }
-
-        return (emailOpenLogRepo.count() * 100.0) / mails;
     }
 
     @GetMapping("/avg-mails-per-user")
@@ -136,51 +120,68 @@ public class AnalyticsController {
         long users = userRepo.count();
 
         if (users == 0) {
-            return 0;
+            return 0.0;
         }
 
         return (double) mailLogRepo.count() / users;
     }
 
+    // =====================================================
+    // AI STATISTICS
+    // =====================================================
+
+    @GetMapping("/ai/count")
+    public long totalAiToday() {
+
+        return aiLogRepo.countByRequestedAtAfter(
+                startOfToday()
+        );
+    }
+
+    // =====================================================
+    // COMBINED DASHBOARD
+    // =====================================================
+
     @GetMapping("/dashboard")
     public Map<String, Object> dashboardSummary() {
 
-        Map<String, Object> map = new HashMap<>();
+        long users = userRepo.count();
 
-        long totalUsers = userRepo.count();
-        long totalMails = mailLogRepo.count();
-        long totalAi = aiLogRepo.count();
-        long opens = emailOpenLogRepo.count();
+        long mails = mailLogRepo.count();
 
-        map.put("totalUsers", totalUsers);
-        map.put("maleUsers", userRepo.findByGender("male").size());
-        map.put("femaleUsers", userRepo.findByGender("female").size());
-        map.put("totalMails", totalMails);
-        map.put("mailsToday",
-                mailLogRepo.findBySentAtAfter(
-                        LocalDateTime.now().minusDays(1)
-                ).size());
-        map.put("aiRequests", totalAi);
-        map.put("emailOpens", opens);
+        long aiToday = totalAiToday();
 
-        map.put("avgSendTime",
-                mailLogRepo.findAverageDuration());
+        long mailsToday = mailsToday();
 
-        map.put("lastDuration",
-                mailLogRepo.findTopByOrderBySentAtDesc()
-                        .map(log -> log.getDurationMs())
-                        .orElse(0L));
+        Map<String, Object> result = new HashMap<>();
 
-        map.put("openRate",
-                totalMails == 0
-                        ? 0
-                        : (opens * 100.0) / totalMails);
+        result.put("totalUsers", users);
 
-        map.put("avgMailsPerUser",
-                totalUsers == 0
-                        ? 0
-                        : (double) totalMails / totalUsers);
+        result.put("maleUsers", maleUserCount());
 
-        return map;
+        result.put("femaleUsers", femaleUserCount());
+
+        result.put("totalMails", mails);
+
+        result.put("mailsToday", mailsToday);
+
+        result.put("aiRequests", aiToday);
+
+        result.put(
+                "avgSendTime",
+                getAverageSendTime()
+        );
+
+        result.put(
+                "lastDuration",
+                getLastDuration()
+        );
+
+        result.put(
+                "avgMailsPerUser",
+                users == 0 ? 0.0 : (double) mails / users
+        );
+
+        return result;
     }
 }

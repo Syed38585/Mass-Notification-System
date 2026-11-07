@@ -2,6 +2,7 @@ package com.project.mailSender.AiStuff;
 
 import com.project.mailSender.Model.AiLog;
 import com.project.mailSender.Repository.AiLogRepo;
+import com.project.mailSender.Service.AiLogService;
 import com.project.mailSender.Service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -32,16 +33,19 @@ public class AiService {
 
     private final AnalyticsAgent analyticsAgent;
 
+    private final AiLogService aiLogService;
+
 
     private final AiLogRepo aiLogRepo;
 
     List<Message> list = new ArrayList<>();
 
-    public AiService(ChatClient.Builder builder, GetUserInfo getUserInfo, EmailTool emailTool, AnalyticsAgent analyticsAgent, AiLogRepo aiLogRepo) {
+    public AiService(ChatClient.Builder builder, GetUserInfo getUserInfo, EmailTool emailTool, AnalyticsAgent analyticsAgent, AiLogService aiLogService, AiLogRepo aiLogRepo) {
         this.chatClient = builder.build();
         this.getUserInfo = getUserInfo;
         this.emailTool = emailTool;
         this.analyticsAgent = analyticsAgent;
+        this.aiLogService = aiLogService;
         this.aiLogRepo = aiLogRepo;
     }
 
@@ -69,7 +73,8 @@ public class AiService {
 
         AiLog log = new AiLog();
         log.setRequestedAt(LocalDateTime.now());
-        aiLogRepo.save(log);
+
+        aiLogService.saveAiRequest();
 
         return chatClient.prompt()
                 .system(SYSTEM_PROMPT)

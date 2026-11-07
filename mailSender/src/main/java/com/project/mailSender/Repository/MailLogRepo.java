@@ -16,4 +16,5 @@ public interface MailLogRepo extends JpaRepository<MailLog, Long> {
     Optional<MailLog> findTopByOrderBySentAtDesc();
 
     List<MailLog> findBySentAtAfter(LocalDateTime time);
+
 }

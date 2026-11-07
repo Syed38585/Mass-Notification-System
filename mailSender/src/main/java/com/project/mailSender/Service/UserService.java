@@ -7,6 +7,8 @@ import com.project.mailSender.Repository.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +30,7 @@ public class UserService {
         users.setAge(user.getAge());
         users.setCountry(user.getCountry());
         users.setSubscribed(true);
+        users.setCreatedAt(LocalDate.now());
         repo.save(users);
          return "DONE";
     }
@@ -67,9 +70,20 @@ public class UserService {
 
     }
 
-    public void delete(Long id) {
-        repo.deleteById(id);
+    public String delete(Long id) {
+
+        Users user = repo.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        user.setDeleted(true);
+        user.setDeletedAt(LocalDateTime.now());
+
+        repo.save(user);
+
+        return "User moved to trash successfully";
     }
+
 
     public String unsubscribe(Long id) {
         Users users = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
@@ -100,5 +114,9 @@ public class UserService {
 
     public List<Users> getUsersByCountry(String country) {
         return repo.findByCountry(country);
+    }
+
+    public List<Users> getTrash() {
+        return repo.getTrash();
     }
 }
